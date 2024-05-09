@@ -1,0 +1,99 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %} Review From {% endblock %}
+
+{% block content %}
+    <div class="header-section">
+        <nav class="navigation">
+            {% for item in navigation_items %}
+                {% if item.example_id %}
+                    <a href="{% url item.url example_id=item.example_id %}">{{ item.name }}</a>
+                {% else %}
+                    <a href="{% url item.url %}">{{ item.name }}</a>
+                {% endif %}
+                {% if not forloop.last %} › {% endif %}
+            {% endfor %}
+        </nav>
+        <p class="welcome">{{ user.username }}, your peers value your suggestions!</p>
+
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="main-content">
+            <div class="problem-context">
+                <h2>WEID: {{ example.id }}</h2>
+                <h3>Problem Context</h3>
+                {{ example.project_context|linebreaks }} {# Allow line breaks #}
+
+                <h3>Problem Description</h3>
+                {{ example.project_description|linebreaks }}
+                <ol>
+                    {% for question in example.questions.all %}  {# Access related questions #}
+                        <li>{{ question.text }}</li>
+                    {% endfor %}
+                </ol>
+
+                <h3>Data</h3>
+                {% for table in example.data_tables.all %}
+                    <h4>{{ table.name }} Table</h4>
+                    <table class="table-style">
+                        <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for column in table.columns.all %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.data_type }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="reviewer-section">
+                <h3>Review</h3>
+                <div class="solution-submission">
+                    {% for question in example.questions.all %}  {# Access related questions #}
+                        <p>{{ forloop.counter }}. {{ question.text }}</p>
+                        <label for="solution">Your Solution</label>
+                        <br>
+                        <textarea id="solution" name="solution"
+                                  placeholder="Enter your proposed solutions here in the format of SQL codes."></textarea>
+                        <br>
+                    {% endfor %}
+                </div>
+
+                <div id="rating-section">
+                    <p>Rate This Worked-Out Example on Following Criteria:</p>
+                    {% for question in review_questions %}
+                        {% if question.response_type == 'rating' %}
+                            <div class="slider-container">
+                                {{ forloop.counter }}. <label for="criteria{{ forloop.counter }}"
+                                                              questionid="{{ question.id }}"> {{ question.question_text }}</label>
+                                <input class="slider" id="criteria{{ forloop.counter }}" max="5" min="1"
+                                       name="criteria{{ forloop.counter }}" step="1" type="range">
+                                <div class="slider-labels" style="--list-length: 5;">
+                                    <span>Completely Disagree</span>
+                                    <span>Disagree</span>
+                                    <span>Neutral</span>
+                                    <span>Agree</span>
+                                    <span>Completely Agree</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="center">
+            <input type="submit" value="Cancel and Exit">
+            <input type="submit" value="Save and Exit">
+            <input type="submit" value="Save and Submit">
+        </div>
+    </form>
+{% endblock %}

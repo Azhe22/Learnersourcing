@@ -1,0 +1,125 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %} Be an Expert {% endblock %}
+{% block content %}
+    <div class="header-section">
+        <nav>
+            {% for item in navigation_items %}
+                <a href="{% url item.url %}">{{ item.name }}</a>{% if not forloop.last %} › {% endif %}
+            {% endfor %}
+        </nav>
+        <p class="welcome">FirstName, your peers value your suggestions!</p>
+    </div>
+    <div>
+        <H2>New Worked-Out Examples:</H2>
+        <p>Have some new ideas on how newly learned knowledge could be applied into real-world scenarios? Click the
+            button
+            below to create it!</p>
+        <button class="new-example" onclick="window.location.href = '{% url 'new_workout' %}'">Create New Worked-Out
+            Example
+        </button>
+    </div>
+    <div>
+        <h2>The Worked-Out Examples in Progress:</h2>
+    </div>
+    {% if incomplete_workouts %}  {# Check if there are any completed workouts #}
+        <table class="table-style">
+            <thead>
+            <tr>
+                <th>WE ID <span class="info-icon"></span></th>
+                <th>Status of Certification</th>
+                <th>Topic</th>
+                <th>Date of Creation <span class="sort-icon"></span></th>
+                <th>Number of Responses <span class="sort-icon"></span></th>
+                <th>Ratings and Reviews</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for workout in completed_workouts %}  {# Loop through the workouts #}
+                <tr>
+                    <td>{{ workout.id }}</td>
+                    {# Display workout ID #}
+                    <td class="checkboxContainer">
+                        <label>
+                            <input class="checkBox" type="checkbox"> {# Checkbox functionality #}
+                        </label>
+                    </td>
+                    <td>{{ workout.title }}</td>
+                    {# Display workout topic #}
+                    <td>{{ workout.created_date|date:"M jS Y" }}</td>
+                    {# Display creation date #}
+                    <td>{{ workout.reviews.count }}</td>
+                    {# Display number of responses (assuming a related 'responses' model) #}
+                    <td>
+                        {% if workout.reviews.exists %}
+                            Available  {# Link to review details if reviews exist #}
+                        {% else %}
+                            Not Available
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="center">No incomplete worked-out examples. Good Job!</p>
+    {% endif %}
+    {#    <div class="center">#}
+    {#        Page: <a href="#">1</a><span>, </span>#}
+    {#        <a href="#">2</a><span>, </span>#}
+    {#        <a href="#">3</a><span>, </span>#}
+    {#        <a href="#">4</a><span>, </span>#}
+    {#    </div>#}
+    <div>
+        <h2>Completed Worked-Out Examples:</h2>
+        {% if completed_workouts %}
+            <table class="table-style">
+                <thead>
+                <tr>
+                    <th>WE ID <span class="info-icon"></span></th>
+                    <th>Status of Certification</th>
+                    <th>Topic</th>
+                    <th>Date of Creation <span class="sort-icon"></span></th>
+                    <th>Number of Responses <span class="sort-icon"></span></th>
+                    <th>Ratings and Reviews</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for workout in completed_workouts %}  {# Loop through the workouts #}
+                    <tr>
+                        <td>{{ workout.id }}</td>
+                        {# Display workout ID #}
+                        <td class="checkboxContainer">
+                            <label>
+                                <input class="checkBox" type="checkbox"> {# Checkbox functionality #}
+                            </label>
+                        </td>
+                        <td>{{ workout.title }}</td>
+                        {# Display workout topic #}
+                        <td>{{ workout.created_date|date:"M jS Y" }}</td>
+                        {# Display creation date #}
+                        <td>{{ workout.reviews.count }}</td>
+                        {# Display number of responses (assuming a related 'responses' model) #}
+                        <td>
+                            {% if workout.reviews.exists %}
+                                Available  {# Link to review details if reviews exist #}
+                            {% else %}
+                                Not Available
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="center">No completed worked-out examples available</p>
+        {% endif %}
+        {#        <div class="center">#}
+        {#            Page: <a href="#">1</a><span>, </span>#}
+        {#            <a href="#">2</a><span>, </span>#}
+        {#            <a href="#">3</a><span>, </span>#}
+        {#            <a href="#">4</a><span>, </span>#}
+        {#        </div>#}
+
+    </div>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %} Create a New Worked-Out Example {% endblock %}
+{% block content %}
+    <div class="header-section" xmlns="http://www.w3.org/1999/html">
+        <nav class="navigation">
+
+            <a href="{% url 'index' %}">Home</a> ›
+            <a href="{% url 'expert' %}">Be an Expert</a> >
+            <a href="">Create a NEW Worked-Out Example</a>
+        </nav>
+        <p class="welcome">Good morning/afternoon/night, Username</p>
+    </div>
+    <form method="post" action="{% url 'new_workout' %}" onsubmit="prepareFormData();">
+        <div class="container">
+            <div class="left-panel">
+                <div class="form-section">
+                    <div>
+                        <label data-target="problem-background">Problem Background</label>
+                        <label data-target="data-section">Data</label>
+                        <label data-target="solution-section">Solution</label>
+                        <label data-target="self-review-section">Self-Review</label>
+                    </div>
+                </div>
+                <div id="problem-background" class="content-Section">
+                    <h2>Problem Context and Description</h2>
+                    <label>Topics Practiced in this worked-out example</label>
+                    <label>
+                        <select name="topic">
+                            <option>Basic PL/SQL</option>
+                            <option>Function</option>
+                            <option>Procedure</option>
+                            <option>Triggers and Constraints</option>
+                            <option>Others</option>
+                        </select>
+                    </label>
+
+                    <label>Problem Context</label>
+                    <label>
+                        <textarea name="problem_context"
+                                  placeholder="Define the context of your worked-out example here."></textarea>
+                    </label>
+
+                    <label>Problem Description</label>
+                    <label>
+                        <textarea name="problem_description"
+                                  placeholder="Describe the problem of your worked-out example here."></textarea>
+                    </label>
+                </div>
+                <div id="data-section" class="content-Section">
+
+                    <h2>Data Tables</h2>
+                    <div>
+                        <label id="data">Data Table #1: </label>
+                        <label for="table name"></label><textarea id="table name"
+                                                                  placeholder="Enter the name for your first data table"></textarea>
+                        <table id="data_table_1">
+                            <tr>
+                                <th>Attribute Name</th>
+                                <th>Attribute Type</th>
+                            </tr>
+                            <tr>
+                                <td><label for="aname"></label><input type="text" id="aname"
+                                                                      value=""></td>
+                                <td><label for="atype"></label><input type="text" id="atype"
+                                                                      value=""></td>
+                            </tr>
+                        </table>
+                        <br>
+
+                        <button type="button" onclick="myCreateFunction('data_table_1')">Create
+                            row
+                        </button>
+                        <button type="button" onclick="myDeleteFunction('data_table_1')">Delete row</button>
+                    </div>
+
+                    <div>
+                        <label id="data">Data Table #2: </label>
+                        <label for="table name"></label><textarea id="table name"
+                                                                  placeholder="Enter the name for your second data table"></textarea>
+                        <table id="data_table_2">
+                            <tr>
+                                <th>Attribute Name</th>
+                                <th>Attribute Type</th>
+                            </tr>
+
+                            <tr>
+                                <td><label for="aname"></label><input type="text" id="aname"
+                                                                      value=""></td>
+                                <td><label for="atype"></label><input type="text" id="atype"
+                                                                      value=""></td>
+                            </tr>
+                        </table>
+                        <br>
+
+                        <button type="button" onclick="myCreateFunction('data_table_2')">Create
+                            row
+                        </button>
+                        <button type="button" onclick="myDeleteFunction('data_table_2')">Delete row</button>
+                    </div>
+                </div>
+                <div id="solution-section" class="content-Section">
+                    <h2>Solution</h2>
+                    <div id="datatable1">
+                        <label id="solution">List your step-by-step solutions below: </label>
+                        <table id="step_table">
+                            <tr>
+                                <th>Step Number</th>
+                                <th>Step Description</th>
+                                <th>Suggested Codes</th>
+                            </tr>
+                            <tr>
+                                <td><label for="snumber"></label><input type="number" id="snumber" value=""></td>
+                                <td><label for="sdescription"></label><input type="text" id="sdescription" value="">
+                                </td>
+                                <td><label for="scode"></label><input type="text" id="scode" value=""></td>
+                            </tr>
+                        </table>
+                        <br>
+
+                        <button type="button" onclick="myCreateFunction('step_table')">Create row</button>
+                        <button type="button" onclick="myDeleteFunction('step_table')">Delete row</button>
+                    </div>
+                </div>
+                <div id="self-review-section" class="content-Section">
+                    <h2>Self-Review</h2>
+                    <div>
+                        {% for question in review_questions %}
+                            {% if question.response_type == 'rating' %}
+                                <div class="slider-container">
+                                    {{ forloop.counter }}. <label for="criteria{{ forloop.counter }}"
+                                > {{ question.question_text }}</label>
+                                    <input class="slider" id="criteria{{ forloop.counter }}" max="5" min="1"
+                                           questionid="{{ question.id }}" step="1" type="range">
+                                    <div class="slider-labels" style="--list-length: 5;">
+                                        <span>Completely Disagree</span>
+                                        <span>Disagree</span>
+                                        <span>Neutral</span>
+                                        <span>Agree</span>
+                                        <span>Completely Agree</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="help-panel">
+                    <h2>Need Help?</h2>
+                    <p>Intentionally left blank for later implementation of ChatGPT</p>
+                </div>
+            </div>
+        </div>
+        <div class="center">
+            {% csrf_token %}
+            <input type="hidden" id="hiddenDataTableFormData" name="data_tables">
+            <input type="hidden" id="hiddenStepTableFormData" name="step_tables">
+            <input type="hidden" id="hiddenReviewData" name="review">
+            <input type="submit" value="Cancel and Exit">
+            <input type="submit" value="Save and Exit">
+            <input type="submit" value="Save and Submit">
+            {#            <button type="submit">Save and Submit</button>#}
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const labels = document.querySelectorAll('.form-section label');
+        labels.forEach(label => {
+            label.addEventListener('click', () => {
+                const target = label.getAttribute('data-target');
+                const contentSections = document.querySelectorAll('.content-Section');
+                contentSections.forEach(section => {
+                    if (section.id === target) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        //Let user enter inputs and add rows for data tables
+        function myCreateFunction(tablename) {
+            const table = document.getElementById(tablename);
+            const firstRow = table.rows[1];  // Get the first row to match the number of cells and input types
+            const cellCount = firstRow.cells.length;  // Number of cells in the first row
+
+            const newRow = table.insertRow(-1);  // Append a new row at the end of the table
+
+            // Create cells and inputs based on the first row
+            for (let i = 0; i < cellCount; i++) {
+                const newCell = newRow.insertCell(i);  // Insert a new cell in the new row
+                const firstInput = firstRow.cells[i].querySelector('input');  // Find the input in the first cell
+                const newInput = document.createElement('input');
+                newInput.type = firstInput.type;  // Set the input type to match the first row
+                newCell.appendChild(newInput);  // Append the input to the new cell
+
+            }
+        }
+
+
+        function myDeleteFunction(tablename) {
+            const table = document.getElementById(tablename);
+            const rowCount = table.rows.length;
+            if (rowCount >= 2) {
+                document.getElementById(tablename).deleteRow(rowCount - 1);
+            }
+
+        }
+
+        function prepareFormData() {
+            const tables = document.querySelectorAll('[id^="data_table"]');
+            const formData = [];
+
+            tables.forEach(table => {
+                const tableData = [];
+                const tableDiv = table.closest('div'); // Get the parent div of the table
+                const tableNameElement = tableDiv.querySelector('textarea#table\\ name'); // Find the textarea for the table name
+                const tableName = tableNameElement.value; // Get the user-input table name
+
+                const rows = table.querySelectorAll('tr:not(:first-child)'); // Exclude the header row
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    if (inputs.length === 2) {
+                        tableData.push({
+                            Attribute_Name: inputs[0].value,
+                            Attribute_Type: inputs[1].value
+                        });
+                    }
+                });
+
+                formData.push({
+                    table_name: tableName, // Include table name in the data
+                    columns: tableData
+                });
+            });
+
+            document.getElementById('hiddenDataTableFormData').value = JSON.stringify(formData);
+
+            // step table data
+            const step_tables = document.querySelectorAll('[id^="step_table"]');
+            const step_data_table = [];
+
+            step_tables.forEach(table => {
+                {#const tableData = [];#}
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    if (inputs.length === 3) {
+                        step_data_table.push({
+                            Step_Number: inputs[0].value,
+                            Step_Description: inputs[1].value,
+                            Suggested_Codes: inputs[2].value
+
+                        });
+                    }
+                });
+                {#step_data_table.push(tableData);#}
+            });
+
+            // Convert formData to JSON string for sending
+            document.getElementById('hiddenStepTableFormData').value = JSON.stringify(step_data_table);
+
+            // review data
+            const review = [];
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                review.push({
+                    question_id: slider.getAttribute('questionid'),
+                    rating: slider.value
+                });
+            });
+            document.getElementById('hiddenReviewData').value = JSON.stringify(review);
+
+        }
+
+    </script>
+{% endblock %}

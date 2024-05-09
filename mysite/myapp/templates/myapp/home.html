@@ -1,0 +1,143 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}Homepage{% endblock %}
+{% block header %}
+    <div class="containerHeader">
+        <div>
+            <img alt="Purdue Logo" id="PurdueLogo" src="{% static 'myapp/Purdue_logo.png' %}">
+        </div>
+        <div>
+            <p id="header">The World of Worked-Out Examples in PL/SQL</p>
+        </div>
+        <div>
+            <img alt="Hamburger Sign" id="HamburgerSign" src="{% static 'myapp/hamburger.png' %}">
+        </div>
+
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="header-section">
+        <div>Homepage</div>
+        {% if user.is_authenticated %}
+            <div>
+                <a id="SignIn">Welcome, {{ user.username }}</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        {% else %}
+            <div>
+                Use your Purdue Email to:
+                <button class="open-button" onclick="openForm1()">Login</button>
+                <div class="form-popup" id="loginForm">
+                    <form method="post" class="form-container">
+                        {% csrf_token %}
+                        <h1>Login</h1>
+
+                        <label for="email"><b>Purdue Email</b></label>
+                        <input id="email" name="username" placeholder="Enter Your Purdue Email" required type="text">
+
+                        <label for="psw"><b>Password</b></label>
+                        <input id="psw" name="password" placeholder="Enter Password" required type="password">
+                        {% if error %}
+                            <p class="text-danger">{{ error }}</p>
+                        {% endif %}
+
+                        <button class="btn" type="submit" name="sign_in">Login</button>
+                        <button class="btn cancel" onclick="closeForm1()" type="button">Close</button>
+                    </form>
+                </div>
+                <button class="open-button" onclick="openForm2()">Sign Up</button>
+                <div class="form-popup" id="signupForm">
+                    <form method="post" class="form-container">
+                        {% csrf_token %}
+                        <h1>Sign Up</h1>
+                        <label for="email">Purdue Email</label>
+                        <label>
+                            <input name="email" placeholder="Enter Your Purdue Email" required type="text">
+                        </label>
+
+                        <label for="email">Username</label>
+                        <label>
+                            <input name="username" placeholder="Enter Your User Name" required type="text">
+                        </label>
+
+                        <label for="psw"><b>Password</b></label>
+                        <label>
+                            <input name="password" placeholder="Enter Your Password" required type="password">
+                        </label>
+                        <label for="psw"><b>Re-enter Password</b></label>
+                        <label>
+                            <input name="password" placeholder="Enter Your Password Again" required type="password">
+                        </label>
+                        <button class="btn" type="submit" name="sign_up">Sign Up</button>
+                        <button class="btn cancel" onclick="closeForm2()" type="button">Close</button>
+                    </form>
+                </div>
+            </div>
+
+
+        {% endif %}
+    </div>
+    <div class="containerBody">
+        <div class="containerButtons" id="expert">
+            <p class="bodyHeader">Ready to Create?</p>
+            <p class="bodyDescription">Create or Finish Your Worked-Out Examples</p>
+        </div>
+
+        <div class="containerButtons" id="review">
+            <div>
+                <p class="bodyHeader">Review Your Peer's Works</p>
+                <p class="bodyDescription">Conduct Peer Review on Your Classmate-Generated Worked-Out Examples</p>
+            </div>
+        </div>
+
+        <div class="containerButtons" id="challenge">
+            <p class="bodyHeader">Ready for Some Challenges?</p>
+            <p class="bodyDescription">Practice with CERTIFIED Worked-Out Examples</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function openForm1() {
+            const form = document.getElementById("loginForm");
+            const visibility = window.getComputedStyle(form).visibility;
+            if (visibility === "hidden") {
+                form.style.visibility = "visible";
+            } else {
+                form.style.visibility = "hidden";
+            }
+        }
+
+        function closeForm1() {
+            document.getElementById("loginForm").style.visibility = "hidden";
+        }
+
+        function openForm2() {
+            const form = document.getElementById("signupForm");
+            const visibility = window.getComputedStyle(form).visibility;
+            if (visibility === "hidden") {
+                form.style.visibility = "visible";
+            } else {
+                form.style.visibility = "hidden";
+            }
+        }
+
+        function closeForm2() {
+            document.getElementById("signupForm").style.visibility = "hidden";
+        }
+
+        document.getElementById("expert").addEventListener("click", function () {
+            window.location.href = '{% url 'expert' %}';
+        });
+
+        document.getElementById("review").addEventListener("click", function () {
+            window.location.href = '{% url 'review' %}';
+        });
+
+        document.getElementById("challenge").addEventListener("click", function () {
+            window.location.href = '{% url 'explorer' %}';
+        });
+
+    </script>
+{% endblock %}

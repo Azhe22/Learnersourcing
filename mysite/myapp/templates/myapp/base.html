@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'myapp/style.css' %}">
+    <script src="{% static 'myapp/Main.js' %}"></script>
+    <script src="https://kit.fontawesome.com/ceb367b3bc.js" crossorigin="anonymous"></script>
+    <!-- Additional head content -->
+</head>
+<body>
+<div id="notification" class="notification">
+{#    <i class="fa-solid fa-triangle-exclamation"></i>#}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="14"><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
+    <span id="notificationMessage"></span>
+</div>
+
+
+{% block header %}
+    <div class="containerHeader">
+        <div>
+            <img alt="Purdue Logo" id="PurdueLogo" src="{% static 'myapp/Purdue_logo.png' %}">
+        </div>
+        <div>
+            <p id="header">Hey {{ user.username }}, let's do some practices</p>
+        </div>
+        <div>
+            <img alt="Hamburger Sign" id="HamburgerSign" src="{% static 'myapp/hamburger.png' %}">
+        </div>
+
+    </div>
+{% endblock header %}
+
+{% block content %}
+    {% block navigation %}
+        <nav id="dynamicNav">
+            <a href="{% url 'myapp:home' %}">Home</a>
+            <a href="{% url 'myapp:about' %}">About</a>
+            <a href="{% url 'myapp:contact' %}">Contact</a>
+        </nav>
+    {% endblock navigation %}
+    <!-- Main content goes here -->
+{% endblock content %}
+
+{% block footer %}
+    <footer id="dynamicFooter" style="cursor: pointer; color: black;">
+        Need Help?<a id="contactLink" href="#"
+                     onclick="event.preventDefault(); alert('Thank you for reaching out! We will get back to you soon.');">Contact
+        Us</a>
+    </footer>
+{% endblock footer %}
+<script>
+    // Function to display the notification
+    function showNotification(message) {
+        const notificationElement = document.getElementById("notification");
+        const messageElement = notificationElement.querySelector('span'); // Assuming the message is within a <span>
+
+        if (messageElement) {
+            messageElement.textContent = message; // Update the text content
+        } else {
+            // Create a new <span> for the message if it doesn't exist
+            const newMessageElement = document.createElement('span');
+            newMessageElement.textContent = message;
+            notificationElement.appendChild(newMessageElement);
+        }
+
+        notificationElement.style.display = "block";
+
+        setTimeout(() => {
+            notificationElement.style.display = "none";
+        }, 5000);
+    }
+
+    // Check if message is passed from other templates
+    {% if messages %}
+        {% for message in messages %}
+            showNotification("{{ message }}");
+        {% endfor %}
+
+    {% endif %}
+</script>
+{% block scripts %}
+{% endblock scripts %}
+</body>
+</html>
