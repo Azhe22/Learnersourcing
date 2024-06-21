@@ -9,9 +9,8 @@ body {
 }
 
 .containerHeader > div {
-    flex: auto
+    flex: auto;
 }
-
 
 #header {
     color: black;
@@ -52,13 +51,11 @@ body {
     z-index: 9;
 }
 
-/* form popup*/
 .form-container {
     max-width: 300px;
     padding: 10px;
     background-color: white;
 }
-
 
 .form-container input[type=text], .form-container input[type=password] {
     width: 90%;
@@ -68,12 +65,10 @@ body {
     background: #f1f1f1;
 }
 
-
 .form-container input[type=text]:focus, .form-container input[type=password]:focus {
     background-color: #ddd;
     outline: none;
 }
-
 
 .form-container .btn {
     background-color: #8e6f3e;
@@ -86,11 +81,9 @@ body {
     opacity: 0.8;
 }
 
-
 .form-container .cancel {
     background-color: gray;
 }
-
 
 .form-container .btn:hover, .open-button:hover {
     opacity: 1;
@@ -102,7 +95,7 @@ body {
 }
 
 .containerSection > div {
-    flex: 1
+    flex: 1;
 }
 
 #containerOverview {
@@ -117,13 +110,13 @@ body {
     font-size: 16pt;
     font-style: italic;
     font-weight: bold;
-    Margin: 5px;
+    margin: 5px;
 }
 
 #overviewText {
     font-family: 'Times New Roman', Times, serif;
     font-size: 14pt;
-    Margin: 5px;
+    margin: 5px;
 }
 
 #containerFunfact {
@@ -138,7 +131,7 @@ body {
     font-size: 16pt;
     font-style: italic;
     font-weight: bold;
-    Margin: 5px;
+    margin: 5px;
 }
 
 .funfactLinks {
@@ -146,7 +139,7 @@ body {
     font-size: 14pt;
     font-style: italic;
     color: #8e6f3e;
-    Margin: 5px;
+    margin: 5px;
 }
 
 .containerBody {
@@ -155,7 +148,7 @@ body {
 }
 
 .containerBody > div {
-    flex: 1
+    flex: 1;
 }
 
 .containerButtons {
@@ -178,7 +171,7 @@ body {
     font-size: 12pt;
     font-style: italic;
     color: black;
-    Margin: 5px;
+    margin: 5px;
     text-align: center;
 }
 
@@ -187,72 +180,64 @@ footer {
     text-align: center;
 }
 
-/*Header*/
 .header-section {
     display: flex;
     justify-content: space-between;
     border: solid 0.1rem black;
     padding: 10px;
-    margin-bottom: 10px
+    margin-bottom: 10px;
 }
 
 .welcome {
     margin-top: 0;
     margin-bottom: 0;
-
 }
 
-/*main-content*/
 .main-content {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
 
-/*problem-context*/
 .problem-context {
     border: solid 0.1rem black;
     padding: 10px;
     overflow: auto;
-    width: 50%;
+    width: 90%;
     margin-right: 10px;
-    /*background: white;*/
 }
 
-/*review*/
 .reviewer-section {
     width: 50%;
     margin-left: 10px;
-
     border: solid 0.1rem black;
     padding: 10px;
-    /*background: white;*/
 }
 
 .notification {
-    display: none; /* Hidden by default */
-    position: fixed; /* Position relative to the viewport */
+    display: none;
+    position: fixed;
     bottom: 1rem;
     left: 50%;
-    transform: translate(-50%, -50%); /* Center both vertically and horizontally */
+    transform: translate(-50%, -50%);
     background-color: #FA7070;
     padding: 15px;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* Ensure it appears above other elements */
+    z-index: 1000;
     color: #8B322C;
 }
-.solution-submission textarea{
+
+.solution-submission textarea {
     width: 100%;
     height: 100px;
     margin-bottom: 10px;
 }
-/*Slider Parts Don't Change as i don't know if i can fix it*/
+
 .slider-container {
     width: 100%;
-    max-width: 80%; /* Adjust the max-width as needed */
+    max-width: 80%;
     position: relative;
-    /*margin-bottom: 30px;*/
     margin: 30px auto;
 }
 
@@ -261,7 +246,7 @@ footer {
     width: 100%;
     height: 15px;
     border-radius: 5px;
-    background: #ddd; /* Slider background */
+    background: #ddd;
     outline: none;
     opacity: 0.7;
     -webkit-transition: .2s;
@@ -281,14 +266,14 @@ footer {
 
 .slider-labels {
     display: flex;
-    margin-top: -4px; /* Adjusted to match the datalist styling */
-    --list-length: 5; /* Number of labels */
+    margin-top: -4px;
+    --list-length: 5;
 }
 
 .slider-labels span {
     text-align: center;
-    white-space: normal; /* Allows text to wrap */
-    font-size: 0.8rem; /* Adjust as needed */
+    white-space: normal;
+    font-size: 0.8rem;
     display: inline-block;
     width: calc((100% - 12px) / (var(--list-length) - 1));
 }
@@ -301,82 +286,66 @@ footer {
 .slider-labels span:last-child {
     width: calc((100% - 12px) / ((var(--list-length) - 1) * 2) + 6px);
     text-align: right;
-
 }
 
-
 .new-example:hover {
-    background-color: #f0f0f0; /* Light grey background on hover for visual feedback */
+    background-color: #f0f0f0;
 }
 
 .new-example:active {
-    background-color: #e0e0e0; /* Slightly darker grey background when the button is clicked */
+    background-color: #e0e0e0;
 }
 
 .checkboxContainer {
     display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-
+    justify-content: center;
+    align-items: center;
 }
 
 .center {
     display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
+    justify-content: center;
+    align-items: center;
 }
 
 .center span {
-    margin-right: 8px; /* Adjust the space as needed */
+    margin-right: 8px;
 }
 
-/* General table styles */
 .table-style {
-    width: 100%; /* Make the table expand full width */
-    border-collapse: collapse; /* Ensures that borders are collapsed into a single border */
-    text-align: left; /* Align text to the left */
-    font-family: Arial, sans-serif; /* Use a sans-serif font */
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: Arial, sans-serif;
 }
 
-/* Header styles */
 .table-style thead th {
-    background-color: #cccccc; /* Dark background for the header */
-    font-weight: bold; /* Bold text for the header */
-    padding: 10px; /* Some padding inside the header cells */
-    border: 1px solid #ddd; /* Light borders for the header cells */
+    background-color: #cccccc;
+    font-weight: bold;
+    padding: 10px;
+    border: 1px solid #ddd;
 }
 
-/* Body styles */
 .table-style tbody td {
-    border: 1px solid #ddd; /* Light borders for the body cells */
-    padding: 8px; /* Padding inside the body cells */
+    border: 1px solid #ddd;
+    padding: 8px;
 }
 
-/* Alternating row styles */
 .table-style tbody tr:nth-child(odd) {
-    background-color: #eeeeee; /* Light gray background for odd rows */
+    background-color: #eeeeee;
 }
 
 .table-style tbody tr:nth-child(even) {
-    background-color: #ffffff; /* White background for even rows */
+    background-color: #ffffff;
 }
 
 .container {
-    width: 100%;
-    overflow: hidden;
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    gap: 20px;
 }
 
-.left-panel, .right-panel {
-    box-sizing: border-box;
-    float: left;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px;
-    display: flex;
-}
 
 .content-Section {
     background: #fff;
@@ -403,29 +372,33 @@ footer {
     margin-bottom: 10px;
 }
 
-.help-panel {
-    border: 1px solid #000;
-    padding: 20px;
 
-    width: 15%;
-    /*height: 100%;*/
 
+.problemContainer {
+    width: 630px;
+    display: flex;
+}
+
+.tab-buttons {
+    display: grid;
+    grid-auto-flow: column;
 }
 
 .form-section {
-    background: #fff;
-    border: 1px solid #000;
-    padding: 20px;
     margin-right: 10px;
+    margin-top: 6px;
     box-sizing: border-box;
+    display: flex;
+    width: 100%;
 }
 
 .form-section div > label {
     display: block;
-    margin-bottom: 5px;
-    border: 1px solid #d3d3d3;
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
     padding: 10px;
-    background-color: #f8f8f8;
+    background-color: white;
 }
 
 .center input[type=submit] {
@@ -444,13 +417,10 @@ footer a {
     color: inherit;
 }
 
-/* Create workout example */
-/* Hide all sections with the class 'content-section' */
 .content-Section {
     display: none;
 }
 
-/* Specifically show the 'problem-background' section */
 #problem-background {
     display: block;
 }
@@ -460,10 +430,183 @@ footer a {
     font-weight: bold;
 }
 
-
-/**/
-.welcome p{
+.welcome p {
     font-size: 1rem;
     font-weight: bold;
     margin: 0;
 }
+
+.preview-panel {
+    padding: 20px;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    margin-top: 20px;
+    width: 90%;
+    margin-left: 10px;
+    white-space: normal; /* Ensures content wraps to new lines */
+}
+
+.preview-panel h2 {
+    margin-top: 0;
+}
+
+.worksheet {
+    display: grid;
+    grid-template-columns: minmax(630px, 1fr) minmax(630px, 1fr);
+    grid-column-gap: 10px;
+}
+
+.preview-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    white-space: normal; /* Ensures content wraps to new lines */
+}
+
+.preview-panel table, .preview-panel th, .preview-panel td {
+    border: 1px solid #dee2e6;
+    white-space: normal; /* Ensures content wraps to new lines */
+}
+
+.preview-panel th, .preview-panel td {
+    padding: 8px;
+    text-align: left;
+    white-space: normal; /* Ensures content wraps to new lines */
+}
+
+.tabs {
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.tablink {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+.tablink:hover {
+    background-color: #ddd;
+}
+
+.tablink.active {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+}
+
+.tabcontent.active {
+    display: block;
+}
+
+.column {
+    flex: 1;
+    padding: 20px;
+}
+
+.left {
+    border-right: 1px solid #ddd;
+}
+
+.right {
+    padding-left: 20px;
+}
+
+.sub-tabcontent {
+    display: none;
+}
+
+.sub-tabcontent.active {
+    display: block;
+}
+
+.grayed-out {
+    color: purple;
+    pointer-events: none;
+}
+
+.selected {
+    pointer-events: none;
+    color: purple;
+}
+
+
+.left-panel, .right-panel {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.problemContainer {
+    display: flex;
+}
+
+.help-panel {
+    border: 1px solid #000;
+    padding: 20px;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.ibutton {
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: black;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: width .3s;
+}
+
+.icon {
+    position: relative; /* Ensure the icon stays in its place */
+    z-index: 1; /* Keep the icon above the expanding text */
+}
+
+.nfo {
+    position: absolute;
+    left: 30px;
+    opacity: 0;
+    white-space: nowrap;
+    color: white;
+    padding-left: 5px; /* Slight padding to create space between the icon and text */
+    transition: opacity .3s, left .3s;
+}
+
+.ibutton:hover {
+    width: 400px;
+}
+
+.ibutton:hover .nfo {
+    opacity: 1;
+    left: 35px;
+}
+
+#step_table {
+    border-collapse: collapse;
+  }
+  
+  #step_table td {
+    margin-top: 10px;
+    display: block; /* Makes each cell a block element */
+    width: 550px; /* Adjust the width as needed */
+  }
+
+  #step_table input {
+    width: 100%; /* Makes the input take the full width of the cell */
+}
+  

@@ -7,6 +7,8 @@ from django.db import models
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_instructor = models.BooleanField(default=False)
+    points = models.IntegerField(default=0)
+    questions_assigned = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
@@ -63,7 +65,12 @@ class QuestionStep(models.Model):
 class Review(models.Model):
     example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='reviews')
     reviewer = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews')
-
+    problem_context_like = models.TextField(default="")
+    problem_context_suggestions = models.TextField(default="")
+    recommendation_likelihood = models.TextField(default="")
+    appropriateness_class = models.TextField(default="")
+    class Meta:
+        unique_together = ('example', 'reviewer')
 
 class ReviewStepResponse(models.Model):
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='step_responses')
@@ -104,3 +111,44 @@ class AssignedReview(models.Model):
 
     def __str__(self):
         return f"{self.example.title} assigned to {self.reviewer.user.username}"
+    
+
+
+class ProblemTable(models.Model):
+    id = models.AutoField(primary_key=True)
+    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_problems')
+    project_context = models.TextField()
+    project_description = models.TextField()
+    provided_solution = models.TextField()
+    problem_type = models.CharField(max_length=255, default="Pl/SQL")
+    self_review = models.FloatField(default=0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+    student_reviewed = models.BooleanField(default=False)
+    instr_reviewed = models.BooleanField(default=False)
+    no_student_reviews = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.title} by {self.creator.user.username}"
+
+class SolnTable(models.Model):
+    id = models.AutoField(primary_key=True)
+    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_solutions')
+    problem = models.ForeignKey(ProblemTable, on_delete=models.CASCADE, related_name='solutions')
+    solution = models.TextField()
+    completed = models.BooleanField(default=False)
+    review_score = models.FloatField(default=0)
+    review = models.TextField()
+    is_review = models.BooleanField(default=False)
+
+class InstrChecks(models.Model):
+    id = models.AutoField(primary_key=True)
+    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_checks')
+    problem_id = models.IntegerField()
+    student_id = models.IntegerField()
+    is_question = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
+    review_score = models.FloatField(default=0)
+    review = models.TextField()
+
+

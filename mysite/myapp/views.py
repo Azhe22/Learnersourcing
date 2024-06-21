@@ -1,5 +1,5 @@
 import json
-
+#import gemini
 import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
-
+from django.db.models import F
+import random
 from .models import Example, ReviewQuestion, Question, DataColumn, DataTable, Profile, Review, ReviewQuestionResponse, \
     ReviewStepResponse
 
@@ -106,13 +107,44 @@ def review_menu(request):
 
 @login_required(login_url='index')
 def review(request, example_id):
+    example = Example.objects.get(pk=example_id)
+    review, created = Review.objects.get_or_create(example=example, reviewer=request.user.profile)
+
     if request.method == 'POST':
         # Process the review submission
-        return redirect('review')
+        action = request.POST.get('action', '')
+        if action == 'Cancel and Exit':
+            # Handle cancel action
+            return redirect('index')  # Redirect to wherever appropriate
+        
+
+        # Save the solution steps
+        for question in example.questions.all():
+            solution_text = request.POST.get(f'solution_{question.id}', '')
+            ReviewStepResponse.objects.update_or_create(
+                review=review, question=question,
+                defaults={'sql_statement': solution_text}
+            )
+
+
+        if action in ['Save and Exit', 'Save and Submit']:
+            review.problem_context_like = request.POST.get('problem_context_like', '')
+            review.problem_context_suggestions = request.POST.get('problem_context_suggestions', '')
+            review.recommendation_likelihood = request.POST.get('recommendation_likelihood', '')
+            review.appropriateness_class = request.POST.get('appropriateness_class', '')
+            review.save()
+        
+        if action == 'Save and Exit':
+            # Handle save and exit action
+            return redirect('index')  # Redirect to wherever appropriate    
+
+        if action == 'Save and Submit':
+            # Handle save and submit action
+            # Assuming you want to redirect to a success page after submission
+            return redirect('index')
     # Fetch the example first (optional: add error handling if example does not exist)
     # example = get_object_or_404(Example, pk=example_id)
-    review_questions = ReviewQuestion.objects.all()
-    example = Example.objects.get(pk=example_id)
+    review_step_responses = ReviewStepResponse.objects.filter(review=review)
 
     context = {
         'user': request.user,
@@ -123,26 +155,10 @@ def review(request, example_id):
             {'name': 'Conduct a Review', 'url': 'review_example', 'example_id': example_id},
             # Assuming you need to pass parameters for clarity
         ],
-        "review_questions": review_questions,
+        'review_step_responses': review_step_responses,
         "example": example,
     }
     return render(request, 'myapp/Show_Review_Examples.html', context)
-    #
-    # if not request.user.profile.is_instructor:
-    #     try:
-    #         assignment = AssignedReview.objects.get(example_id=example.id, reviewer=request.user.profile)
-    #     except AssignedReview.DoesNotExist:
-    #         return HttpResponseForbidden("You are not assigned to review this example.")
-    #
-    #     if request.method == 'POST':
-    #         # Process the review submission
-    #         assignment.completed = True
-    #         assignment.save()
-    #         return redirect('review')  # Ensure this URL is properly named and defined in your urls.py
-    #
-    #     context['assignment'] = assignment  # Add assignment to context if needed in the template
-    #
-    # return render(request, 'myapp/Show_Review_Examples.html', context)
 
 
 @login_required(login_url='index')
@@ -150,9 +166,10 @@ def new_workout(request):
     if request.method == "POST":
         # Decode the POST data
         try:
-            data_tables_data = json.loads(request.POST.get('data_tables', '[]'))
+            data_tables_data = json.loads(request.POST.get('data_table_form_data', '[]'))
             step_tables_data = json.loads(request.POST.get('step_tables', '[]'))
             review_data = json.loads(request.POST.get('review', '[]'))
+
         except json.JSONDecodeError:
             return HttpResponse("Invalid JSON data", status=400)
 
@@ -167,7 +184,6 @@ def new_workout(request):
             project_context=request.POST.get('problem_context', ''),
             completed=True
         )
-
         # Create Data Tables and Columns
         for table_info in data_tables_data:
             data_table = DataTable.objects.create(
@@ -180,7 +196,19 @@ def new_workout(request):
                     name=column_info['Attribute_Name'],
                     data_type=column_info['Attribute_Type']
                 )
-        review = Review.objects.create(
+        
+        all_users = Profile.objects.all()
+        eligible_users = all_users.exclude(questions_assigned__gte=3)
+        if eligible_users.exists():
+            selected_user = random.choice(eligible_users)
+
+            selected_user.questions_assigned = F('questions_assigned') + 1
+            review = Review.objects.create(
+            example=example,
+            reviewer=selected_user
+        )
+        else:
+            review = Review.objects.create(
             example=example,
             reviewer=request.user.profile  # Assuming the creator is also the reviewer for now
         )
