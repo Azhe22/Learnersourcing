@@ -4,162 +4,115 @@
 {% block content %}
     <div class="header-section" xmlns="http://www.w3.org/1999/html">
         <nav class="navigation">
-
             <a href="{% url 'index' %}">Home</a> ›
-            <a href="{% url 'expert' %}">Be an Expert</a> >
+            <a href="{% url 'expert' %}">Be an Expert</a> ›
             <a href="">Create a NEW Worked-Out Example</a>
         </nav>
         <p class="welcome">Good morning/afternoon/night, Username</p>
     </div>
     <form method="post" action="{% url 'new_workout' %}" onsubmit="prepareFormData();">
         <div class="container">
-            <div class="left-panel">
-                <div class="form-section">
-                    <div>
-                        <label data-target="problem-background">Problem Background</label>
-                        <label data-target="data-section">Data</label>
-                        <label data-target="solution-section">Solution</label>
-                        <label data-target="self-review-section">Self-Review</label>
+            <div class="side-by-side">
+                <div class="left-panel">
+                    <div class="form-section">
+                        <div class="tab-buttons">
+                            <label class="selected" data-target="problem-background">Problem Background</label>
+                            <label data-target="data-section">Data</label>
+                            <label data-target="solution-section">Solution</label>
+                        </div>
                     </div>
-                </div>
-                <div id="problem-background" class="content-Section">
-                    <h2>Problem Context and Description</h2>
-                    <label>Topics Practiced in this worked-out example</label>
-                    <label>
-                        <select name="topic">
-                            <option>Basic PL/SQL</option>
-                            <option>Function</option>
-                            <option>Procedure</option>
-                            <option>Triggers and Constraints</option>
-                            <option>Others</option>
-                        </select>
-                    </label>
-
-                    <label>Problem Context</label>
-                    <label>
-                        <textarea name="problem_context"
-                                  placeholder="Define the context of your worked-out example here."></textarea>
-                    </label>
-
-                    <label>Problem Description</label>
-                    <label>
-                        <textarea name="problem_description"
-                                  placeholder="Describe the problem of your worked-out example here."></textarea>
-                    </label>
-                </div>
-                <div id="data-section" class="content-Section">
-
-                    <h2>Data Tables</h2>
-                    <div>
-                        <label id="data">Data Table #1: </label>
-                        <label for="table name"></label><textarea id="table name"
-                                                                  placeholder="Enter the name for your first data table"></textarea>
-                        <table id="data_table_1">
-                            <tr>
-                                <th>Attribute Name</th>
-                                <th>Attribute Type</th>
-                            </tr>
-                            <tr>
-                                <td><label for="aname"></label><input type="text" id="aname"
-                                                                      value=""></td>
-                                <td><label for="atype"></label><input type="text" id="atype"
-                                                                      value=""></td>
-                            </tr>
-                        </table>
-                        <br>
-
-                        <button type="button" onclick="myCreateFunction('data_table_1')">Create
-                            row
-                        </button>
-                        <button type="button" onclick="myDeleteFunction('data_table_1')">Delete row</button>
-                    </div>
-
-                    <div>
-                        <label id="data">Data Table #2: </label>
-                        <label for="table name"></label><textarea id="table name"
-                                                                  placeholder="Enter the name for your second data table"></textarea>
-                        <table id="data_table_2">
-                            <tr>
-                                <th>Attribute Name</th>
-                                <th>Attribute Type</th>
-                            </tr>
-
-                            <tr>
-                                <td><label for="aname"></label><input type="text" id="aname"
-                                                                      value=""></td>
-                                <td><label for="atype"></label><input type="text" id="atype"
-                                                                      value=""></td>
-                            </tr>
-                        </table>
-                        <br>
-
-                        <button type="button" onclick="myCreateFunction('data_table_2')">Create
-                            row
-                        </button>
-                        <button type="button" onclick="myDeleteFunction('data_table_2')">Delete row</button>
-                    </div>
-                </div>
-                <div id="solution-section" class="content-Section">
-                    <h2>Solution</h2>
-                    <div id="datatable1">
-                        <label id="solution">List your step-by-step solutions below: </label>
-                        <table id="step_table">
-                            <tr>
-                                <th>Step Number</th>
-                                <th>Step Description</th>
-                                <th>Suggested Codes</th>
-                            </tr>
-                            <tr>
-                                <td><label for="snumber"></label><input type="number" id="snumber" value=""></td>
-                                <td><label for="sdescription"></label><input type="text" id="sdescription" value="">
-                                </td>
-                                <td><label for="scode"></label><input type="text" id="scode" value=""></td>
-                            </tr>
-                        </table>
-                        <br>
-
-                        <button type="button" onclick="myCreateFunction('step_table')">Create row</button>
-                        <button type="button" onclick="myDeleteFunction('step_table')">Delete row</button>
-                    </div>
-                </div>
-                <div id="self-review-section" class="content-Section">
-                    <h2>Self-Review</h2>
-                    <div>
-                        {% for question in review_questions %}
-                            {% if question.response_type == 'rating' %}
-                                <div class="slider-container">
-                                    {{ forloop.counter }}. <label for="criteria{{ forloop.counter }}"
-                                > {{ question.question_text }}</label>
-                                    <input class="slider" id="criteria{{ forloop.counter }}" max="5" min="1"
-                                           questionid="{{ question.id }}" step="1" type="range">
-                                    <div class="slider-labels" style="--list-length: 5;">
-                                        <span>Completely Disagree</span>
-                                        <span>Disagree</span>
-                                        <span>Neutral</span>
-                                        <span>Agree</span>
-                                        <span>Completely Agree</span>
-                                    </div>
+                    <div class="worksheet">
+                        <div class="problemContainer">
+                            <div id="problem-background" class="content-Section">
+                                <h2>Problem Context and Description</h2>
+                                <label>Topics Practiced in this worked-out example</label>
+                                <label>
+                                    <select name="topic" onchange="updatePreview()">
+                                        <option>Basic PL/SQL</option>
+                                        <option>Function</option>
+                                        <option>Procedure</option>
+                                        <option>Triggers and Constraints</option>
+                                        <option>Others</option>
+                                    </select>
+                                </label>
+                                <label><strong>Problem Context</strong></label>
+                                <button class="ibutton">
+                                    <span class="icon">i</span>
+                                    <span class="nfo">Define the context of your worked-out example here.</span>
+                                </button>                                                               
+                                <div>
+                                    <button type="button" class="empty-button">Help with Problem Context</button>
                                 </div>
-                            {% endif %}
-                        {% endfor %}
+                                <label>
+                                    <textarea name="problem_context" placeholder="Define the context of your worked-out example here." oninput="updatePreview()"></textarea>
+                                </label>
+                                <label><strong>Problem Description</strong></label> 
+                                <button class="ibutton">
+                                    <span class="icon">i</span>
+                                    <span class="nfo">Describe the problem of your worked-out example here.</span>
+                                </button> 
+                                <div>
+                                    <button type="button" class="empty-button">Help with Problem Description</button>
+                                </div>
+                                <label>
+                                    <textarea name="problem_description" placeholder="Describe the problem of your worked-out example here." oninput="updatePreview()"></textarea>
+                                </label>
+                            </div>                            
+                            <div id="data-section" class="content-Section">
+                                <h2>Data Tables</h2>
+                                <div id="data-tables-container">
+                                    <!-- This is where dynamically added tables will go -->
+                                </div>
+                                <button type="button" onclick="addNewTable()">Add Data Table</button>
+                            </div>
+                            <div id="solution-section" class="content-Section">
+                                <h2>Solution</h2>
+                                <div id="datatable1">
+                                    <label id="solution">List your step-by-step solutions below: </label>
+                                    <button class="ibutton">
+                                        <span class="icon">i</span>
+                                        <span class="nfo">Describe your step numbers, description and code here.</span>
+                                    </button>
+                                    <table id="step_table">
+                                        <tr>
+                                            <td><label for="snumber"></label><input type="number" id="snumber" placeholder = "Step Number" value="" oninput="updatePreview()"></td>
+                                            <td><label for="sdescription"></label><input type="text" id="sdescription" placeholder = "Step Description" value="" oninput="updatePreview()"></td>
+                                            <td><label for="scode"></label><input type="text" id="scode" placeholder = "Suggested Code" value="" oninput="updatePreview()"></td>
+                                        </tr>
+                                    </table>                                    
+                                    <br>
+                                    <button type="button" onclick="myCreateFunction('step_table')">Create row</button>
+                                    <button type="button" onclick="myDeleteFunction('step_table')">Delete row</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="help-panel">
+                            <h2>Preview</h2>
+                            <div class="preview-panel">
+                                <div id="preview-content">
+                                    <p><strong>Problem Context:</strong> <span id="preview-problem-context"></span></p>
+                                    <p><strong>Problem Description:</strong> <span id="preview-problem-description"></span></p>
+                                    <p><strong>Data Tables:</strong></p>
+                                    <div id="preview-data-tables"></div>
+                                    <p><strong>Solution Steps:</strong></p>
+                                    <div id="preview-solution-steps"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
-                <div class="help-panel">
-                    <h2>Need Help?</h2>
-                    <p>Intentionally left blank for later implementation of ChatGPT</p>
-                </div>
             </div>
         </div>
         <div class="center">
             {% csrf_token %}
-            <input type="hidden" id="hiddenDataTableFormData" name="data_tables">
+            <input type="hidden" id="hiddenDataTableFormData" name="data_table_form_data">
             <input type="hidden" id="hiddenStepTableFormData" name="step_tables">
             <input type="hidden" id="hiddenReviewData" name="review">
             <input type="submit" value="Cancel and Exit">
             <input type="submit" value="Save and Exit">
             <input type="submit" value="Save and Submit">
-            {#            <button type="submit">Save and Submit</button>#}
         </div>
     </form>
 {% endblock %}
@@ -181,10 +134,90 @@
             });
         });
 
-        //Let user enter inputs and add rows for data tables
+        let tableCounter = 1; // Counter for tracking table IDs
+
+        function addNewTable() {
+            const container = document.getElementById('data-tables-container');
+
+            // Create new table div
+            const newTableDiv = document.createElement('div');
+            newTableDiv.innerHTML = `
+                <label>Data Table #${tableCounter}:</label>
+                <textarea placeholder="Enter the name for your data table" oninput="updatePreview()"></textarea>
+                <table id="data_table_${tableCounter}">
+                    <tr>
+                        <th>Attribute Name</th>
+                        <th>Attribute Type</th>
+                        <th>Constraints</th> 
+                    </tr>
+            <tr>
+                <td><label for="aname"></label><input type="text" id="aname" value="" oninput="updatePreview()"></td>
+                <td><label for="atype"></label><input type="text" id="atype" value="" oninput="updatePreview()"></td>
+                <td><label for="aconstraints"></label><input type="text" id="aconstraints" value="" oninput="updatePreview()"></td>
+            </tr>
+                </table>
+                <br>
+                <button type="button" onclick="myCreateFunction('data_table_${tableCounter}')">Create row</button>
+                <button type="button" onclick="myDeleteFunction('data_table_${tableCounter}')">Delete row</button>
+            `;
+
+            container.appendChild(newTableDiv);
+
+            tableCounter++; // Increment table counter
+        }
+
+        function updatePreview() {
+    // Update problem context and description
+    document.getElementById('preview-problem-context').textContent = document.querySelector('[name="problem_context"]').value;
+    document.getElementById('preview-problem-description').textContent = document.querySelector('[name="problem_description"]').value;
+
+    // Update data tables preview
+    const dataTablePreviews = [];
+    const tables = document.querySelectorAll('[id^="data_table"]');
+    tables.forEach(table => {
+        const tableDiv = table.closest('div');
+        const tableNameElement = tableDiv.querySelector('textarea');
+        const tableName = tableNameElement.value;
+        const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
+        const tableData = rows.map(row => {
+            const inputs = row.querySelectorAll('input');
+            return `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>${inputs[2].value}</td></tr>`; // Adjusted for constraints input
+        }).join('');
+        dataTablePreviews.push(`<div><strong>${tableName}:</strong><table><tr><th>Attribute Name</th><th>Attribute Type</th><th>Constraints</th></tr>${tableData}</table></div>`);
+    });
+    document.getElementById('preview-data-tables').innerHTML = dataTablePreviews.join('');
+
+
+    // Update solution steps preview
+    const stepTablePreviews = [];
+    const stepTables = document.querySelectorAll('[id^="step_table"]');
+    stepTables.forEach(stepTable => {
+        const stepRows = Array.from(stepTable.querySelectorAll('tr'));
+        stepTablePreviews.push(stepRows.map(row => {
+            const inputs = row.querySelectorAll('input');
+            return `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>${inputs[2].value}</td></tr>`;
+        }).join(''));
+    });
+    document.getElementById('preview-solution-steps').innerHTML = stepTablePreviews.map(table => `<table><tr><th>Step Number</th><th>Step Description</th><th>Suggested Codes</th></tr>${table}</table>`).join('');
+
+    // Update self-review preview
+    const reviewPreviews = [];
+    const sliders = document.querySelectorAll('.slider');
+    sliders.forEach(slider => {
+        const questionText = slider.previousElementSibling.textContent.trim();
+        reviewPreviews.push(`<p>${questionText}: ${slider.value}</p>`);
+    });
+    document.getElementById('preview-self-review').innerHTML = reviewPreviews.join('');
+}
+
+
         function myCreateFunction(tablename) {
             const table = document.getElementById(tablename);
-            const firstRow = table.rows[1];  // Get the first row to match the number of cells and input types
+            var firstRow = table.rows[0];  // Get the first row to match the number of cells and input types
+            if (tablename.includes("data")) 
+                firstRow = table.rows[1];
+            else
+                firstRow = table.rows[0];
             const cellCount = firstRow.cells.length;  // Number of cells in the first row
 
             const newRow = table.insertRow(-1);  // Append a new row at the end of the table
@@ -195,19 +228,18 @@
                 const firstInput = firstRow.cells[i].querySelector('input');  // Find the input in the first cell
                 const newInput = document.createElement('input');
                 newInput.type = firstInput.type;  // Set the input type to match the first row
+                newInput.oninput = updatePreview;  // Add the oninput event listener to update preview
                 newCell.appendChild(newInput);  // Append the input to the new cell
-
             }
         }
-
 
         function myDeleteFunction(tablename) {
             const table = document.getElementById(tablename);
             const rowCount = table.rows.length;
             if (rowCount >= 2) {
-                document.getElementById(tablename).deleteRow(rowCount - 1);
+                table.deleteRow(rowCount - 1);
+                updatePreview();  // Update preview after deleting a row
             }
-
         }
 
         function prepareFormData() {
@@ -217,20 +249,17 @@
             tables.forEach(table => {
                 const tableData = [];
                 const tableDiv = table.closest('div'); // Get the parent div of the table
-                const tableNameElement = tableDiv.querySelector('textarea#table\\ name'); // Find the textarea for the table name
+                const tableNameElement = tableDiv.querySelector('textarea');
                 const tableName = tableNameElement.value; // Get the user-input table name
 
-                const rows = table.querySelectorAll('tr:not(:first-child)'); // Exclude the header row
+                const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input');
-                    if (inputs.length === 2) {
                         tableData.push({
                             Attribute_Name: inputs[0].value,
-                            Attribute_Type: inputs[1].value
+                            Attribute_Type: inputs[1].value + "; " + inputs[2].value // Combined type and constraints 
                         });
-                    }
                 });
-
                 formData.push({
                     table_name: tableName, // Include table name in the data
                     columns: tableData
@@ -244,7 +273,6 @@
             const step_data_table = [];
 
             step_tables.forEach(table => {
-                {#const tableData = [];#}
                 const rows = table.querySelectorAll('tr');
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input');
@@ -253,14 +281,11 @@
                             Step_Number: inputs[0].value,
                             Step_Description: inputs[1].value,
                             Suggested_Codes: inputs[2].value
-
                         });
                     }
                 });
-                {#step_data_table.push(tableData);#}
             });
 
-            // Convert formData to JSON string for sending
             document.getElementById('hiddenStepTableFormData').value = JSON.stringify(step_data_table);
 
             // review data
@@ -273,8 +298,30 @@
                 });
             });
             document.getElementById('hiddenReviewData').value = JSON.stringify(review);
-
         }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            const buttons = document.querySelectorAll(".tab-buttons label");
 
+            function setSelected(button) {
+                buttons.forEach(btn => btn.classList.remove("selected"));
+                button.classList.add("selected");
+            }
+
+            // Set the initial selected button
+            const initialSelected = document.querySelector(".tab-buttons .selected");
+            if (initialSelected) {
+                setSelected(initialSelected);
+            }
+
+            // Add click event listeners
+            buttons.forEach(button => {
+                button.addEventListener("click", function() {
+                    setSelected(button);
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', updatePreview);
     </script>
 {% endblock %}
