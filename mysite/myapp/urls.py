@@ -11,4 +11,7 @@ urlpatterns = [
     path("review/<int:example_id>", views.review, name="review_example"),
     path("new_workout", views.new_workout, name="new_workout"),
     path("logout", views.logout_view, name="logout"),
+    path("instr", views.instr, name="instructor"),
+    path("instr/<int:example_id>", views.instr_review, name="instr_review")
+
 ]

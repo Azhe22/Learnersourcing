@@ -1,5 +1,6 @@
 {% extends 'myapp/base.html' %}
 {% load static %}
+{% load custom_filters %}
 {% block title %} Review Form {% endblock %}
 
 {% block content %}
@@ -30,28 +31,26 @@
                 {{ example.project_description|linebreaks }}
 
                 <h3>Data</h3>
-                {% for table in example.data_tables.all %}
-                    <h4>{{ table.name }} Table</h4>
+                {% for table_name, columns in tables.items %}
+                    <h4>{{ table_name }} Table</h4>
                     <table class="table-style">
                         <thead>
                         <tr>
-                            <th>Column Name</th>
-                            <th>Data Type</th>
-                            <th>Data Constraints</th>
+                            {% for column in columns %}
+                                {% for column_name, _ in column.items %}
+                                    <th>{{ column_name }}</th>
+                                {% endfor %}
+                            {% endfor %}
                         </tr>
                         </thead>
                         <tbody>
-                        {% for column in table.columns.all %}
+                            {% for i in table_lengths|get_item:table_name|range_filter %}
                             <tr>
-                                <td>{{ column.name }}</td>
-                                {% with column.data_type as data_type %}
-                                    {% with data_type|slice:"0:data_type|find:';'" as first_part %}
-                                        <td>{{ first_part }}</td>
-                                    {% endwith %}
-                                    {% with data_type|slice:"data_type|find:';'+1:" as second_part %}
-                                        <td>{{ second_part }}</td>
-                                    {% endwith %}
-                                {% endwith %}
+                                {% for column in columns %}
+                                    {% for _, values in column.items %}
+                                    <td>{{ values|get_value_from_list:i }}</td> <!-- Custom filter to get list element -->                                   
+                                    {% endfor %}
+                                {% endfor %}
                             </tr>
                         {% endfor %}
                         </tbody>

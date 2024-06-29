@@ -438,12 +438,11 @@ footer a {
 
 .preview-panel {
     padding: 20px;
-    border: 1px solid #ced4da;
-    background-color: #f8f9fa;
     margin-top: 20px;
     width: 90%;
     margin-left: 10px;
     white-space: normal; /* Ensures content wraps to new lines */
+    font-size: 18px;
 }
 
 .preview-panel h2 {
@@ -543,6 +542,7 @@ footer a {
     padding: 10px;
     display: flex;
     flex-direction: column;
+    font-size: 18px;
 }
 
 .problemContainer {
@@ -554,13 +554,15 @@ footer a {
     padding: 20px;
     background-color: #f8f9fa;
     width: 100%;
+    font-size: 18px;
+
 }
 
 .ibutton {
     border: none;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
+    width: 15px;
+    height: 15px;
     border-radius: 15px;
     background-color: black;
     color: #fff;
@@ -570,6 +572,7 @@ footer a {
     position: relative;
     overflow: hidden;
     transition: width .3s;
+    margin-left: 10px;
 }
 
 .icon {
@@ -579,7 +582,7 @@ footer a {
 
 .nfo {
     position: absolute;
-    left: 30px;
+    left: 10px;
     opacity: 0;
     white-space: nowrap;
     color: white;
@@ -609,4 +612,21 @@ footer a {
   #step_table input {
     width: 100%; /* Makes the input take the full width of the cell */
 }
+
+.step-textarea {
+    width: 100%; /* Adjust the width as needed */
+    height: 100px; /* Adjust the height as needed */
+}
   
+#preview-solution-steps td{
+    display: block;
+}
+
+.inline-container {
+    display: flex;
+    align-items: center;
+}
+
+.textarea {
+    font-size: 10px;
+}

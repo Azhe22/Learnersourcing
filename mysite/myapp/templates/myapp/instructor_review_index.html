@@ -1,0 +1,78 @@
+{% extends 'myapp/base.html' %}
+{% load variable_filters %}
+{% block title %} Be an Explorer {% endblock %}
+{% block content %}
+    <div class="header-section">
+        <nav class="navgaition">
+            {% for item in navigation_items %}
+                <a href="{% url item.url %}">{{ item.name }}</a>{% if not forloop.last %} › {% endif %}
+            {% endfor %}
+        </nav>
+        <div class="welcome">
+            <p>
+                {% now "H" as current_hour %} {# Get the current hour (24-hour format) #}
+                {% if current_hour|to_int >= 5 and current_hour|to_int < 12 %}
+                    Good morning,
+                {% elif current_hour|to_int >= 12 and current_hour|to_int < 18 %}
+                    Good afternoon,
+                {% else %}
+                    Good evening,
+                {% endif %}
+                {{ user.username }}
+            </p>
+            <p>
+                {% if temperature and description %}
+                    The weather in West Lafayette is {{ temperature }} F and {{ description }} .
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+    <div>
+        <h2>
+            Assigned Workouts Examples:
+        </h2>
+        {% if example_list %}  {# Check if there are any completed workouts #}
+            <table class="table-style">
+                <thead>
+                <tr>
+                    <th>WE ID <span class="info-icon"></span></th>
+                    <th>Status of Certification</th>
+                    <th>Topic</th>
+                    <th>Date of Creation <span class="sort-icon"></span></th>
+                    <th>Number of Responses <span class="sort-icon"></span></th>
+                    <th>Ratings and Reviews</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for workout in example_list %}  {# Loop through the workouts #}
+                    <tr>
+                        <td><a href="{% url 'instr_review' workout.id %}">{{ workout.id }}</a></td>
+                        {# Display workout ID #}
+                        <td class="checkboxContainer">
+                            <label>
+                                <input class="checkBox" type="checkbox"> {# Checkbox functionality #}
+                            </label>
+                        </td>
+                        <td>{{ workout.title }}</td>
+                        {# Display workout topic #}
+                        <td>{{ workout.created_date|date:"M jS Y" }}</td>
+                        {# Display creation date #}
+                        <td>{{ workout.reviews.count }}</td>
+                        {# Display number of responses (assuming a related 'responses' model) #}
+                        <td>
+                            {% if workout.reviews.exists %}
+                                Available  {# Link to review details if reviews exist #}
+                            {% else %}
+                                Not Available
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="center">No worked-out examples to review. Good Job!</p>
+        {% endif %}
+    </div>
+{% endblock %}

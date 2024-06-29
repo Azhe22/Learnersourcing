@@ -35,24 +35,29 @@
                                         <option>Others</option>
                                     </select>
                                 </label>
+                                <div class="inline-container">
                                 <label><strong>Problem Context</strong></label>
-                                <button class="ibutton">
+                                <button class="ibutton" onclick="preventDefaultAction(event)">
                                     <span class="icon">i</span>
                                     <span class="nfo">Define the context of your worked-out example here.</span>
-                                </button>                                                               
+                                </button>   
+                                </div>                                                            
                                 <div>
-                                    <button type="button" class="empty-button">Help with Problem Context</button>
+                                    <button type="button" style="margin-bottom: 4px;" class="empty-button">Help with Problem Context</button>
                                 </div>
                                 <label>
                                     <textarea name="problem_context" placeholder="Define the context of your worked-out example here." oninput="updatePreview()"></textarea>
                                 </label>
-                                <label><strong>Problem Description</strong></label> 
-                                <button class="ibutton">
-                                    <span class="icon">i</span>
-                                    <span class="nfo">Describe the problem of your worked-out example here.</span>
-                                </button> 
+                                <div class="inline-container">
+                                    <label><strong>Problem Description</strong></label> 
+                                    <button class="ibutton" onclick="preventDefaultAction(event)">
+                                        <span class="icon">i</span>
+                                        <span class="nfo">Describe the problem of your worked-out example here.</span>
+                                    </button>
+                                </div>
+                                
                                 <div>
-                                    <button type="button" class="empty-button">Help with Problem Description</button>
+                                    <button type="button" style="margin-bottom: 4px;" class="empty-button">Help with Problem Description</button>
                                 </div>
                                 <label>
                                     <textarea name="problem_description" placeholder="Describe the problem of your worked-out example here." oninput="updatePreview()"></textarea>
@@ -62,34 +67,61 @@
                                 <h2>Data Tables</h2>
                                 <div id="data-tables-container">
                                     <!-- This is where dynamically added tables will go -->
+                                    <label>Data Table #1:</label>
+                                    <input type="text" style="width: 210px;" placeholder="Enter the name for your data table" oninput="updatePreview()">
+                                    <table id="data_table_${tableCounter}">
+                    <tr>
+                        <th>Attribute Name</th>
+                        <th>Attribute Type</th>
+                        <th>Constraints</th> 
+                    </tr>
+            <tr>
+                <td><label for="aname"></label><input type="text" id="aname" value="" oninput="updatePreview()"></td>
+                <td><label for="atype"></label><input type="text" id="atype" value="" oninput="updatePreview()"></td>
+                <td><label for="aconstraints"></label><input type="text" id="aconstraints" value="" oninput="updatePreview()"></td>
+            </tr>
+                </table>
+                <br>
+                <button type="button" onclick="myCreateFunction('data_table_${tableCounter}')">Create row</button>
+                <button type="button" onclick="myDeleteFunction('data_table_${tableCounter}')">Delete row</button>
                                 </div>
-                                <button type="button" onclick="addNewTable()">Add Data Table</button>
+                                <button style="margin-top: 20px;" type="button" onclick="addNewTable()">Add Data Table</button>
                             </div>
                             <div id="solution-section" class="content-Section">
                                 <h2>Solution</h2>
                                 <div id="datatable1">
                                     <label id="solution">List your step-by-step solutions below: </label>
-                                    <button class="ibutton">
+                                    <button class="ibutton" style="margin-left: -3px;" onclick="preventDefaultAction(event)">
                                         <span class="icon">i</span>
                                         <span class="nfo">Describe your step numbers, description and code here.</span>
                                     </button>
                                     <table id="step_table">
                                         <tr>
-                                            <td><label for="snumber"></label><input type="number" id="snumber" placeholder = "Step Number" value="" oninput="updatePreview()"></td>
-                                            <td><label for="sdescription"></label><input type="text" id="sdescription" placeholder = "Step Description" value="" oninput="updatePreview()"></td>
-                                            <td><label for="scode"></label><input type="text" id="scode" placeholder = "Suggested Code" value="" oninput="updatePreview()"></td>
+                                            <td>
+                                                <label for="snumber"></label>
+                                                <span class="step-number">1</span>
+                                            </td>
+                                            <td>
+                                                <label for="sdescription"></label>
+                                                <textarea id="sdescription" class="step-textarea" placeholder="Step Description" oninput="updatePreview()"></textarea>
+                                            </td>
+                                            <td>
+                                                <label for="scode"></label>
+                                                <textarea id="scode" class="step-textarea" placeholder="Suggested Code" oninput="updatePreview()"></textarea>
+                                            </td>
                                         </tr>
                                     </table>                                    
                                     <br>
-                                    <button type="button" onclick="myCreateFunction('step_table')">Create row</button>
-                                    <button type="button" onclick="myDeleteFunction('step_table')">Delete row</button>
+                                    <button type="button" onclick="myCreateFunction('step_table')">Create Step</button>
+                                    <button type="button" onclick="myDeleteFunction('step_table')">Delete Step</button>
                                 </div>
                             </div>
                         </div>
                         <div class="help-panel">
-                            <h2>Preview</h2>
+                            <h2 style="margin-top: -4px; margin-bottom: -12px;">Preview</h2>
                             <div class="preview-panel">
                                 <div id="preview-content">
+                                    <p style="margin-top: -12px;"><strong>Problem Topic:</strong> <span id="preview-problem-topic"></span></p>
                                     <p><strong>Problem Context:</strong> <span id="preview-problem-context"></span></p>
                                     <p><strong>Problem Description:</strong> <span id="preview-problem-description"></span></p>
                                     <p><strong>Data Tables:</strong></p>
@@ -134,7 +166,7 @@
             });
         });
 
-        let tableCounter = 1; // Counter for tracking table IDs
+        let tableCounter = 2; // Counter for tracking table IDs
 
         function addNewTable() {
             const container = document.getElementById('data-tables-container');
@@ -143,7 +175,7 @@
             const newTableDiv = document.createElement('div');
             newTableDiv.innerHTML = `
                 <label>Data Table #${tableCounter}:</label>
-                <textarea placeholder="Enter the name for your data table" oninput="updatePreview()"></textarea>
+                <input type="text" style="width: 210px;" placeholder="Enter the name for your data table" oninput="updatePreview()">
                 <table id="data_table_${tableCounter}">
                     <tr>
                         <th>Attribute Name</th>
@@ -168,6 +200,7 @@
 
         function updatePreview() {
     // Update problem context and description
+    document.getElementById('preview-problem-topic').textContent = document.querySelector('[name="topic"]').value;
     document.getElementById('preview-problem-context').textContent = document.querySelector('[name="problem_context"]').value;
     document.getElementById('preview-problem-description').textContent = document.querySelector('[name="problem_description"]').value;
 
@@ -176,14 +209,14 @@
     const tables = document.querySelectorAll('[id^="data_table"]');
     tables.forEach(table => {
         const tableDiv = table.closest('div');
-        const tableNameElement = tableDiv.querySelector('textarea');
+        const tableNameElement = tableDiv.querySelector('input[type="text"]');
         const tableName = tableNameElement.value;
         const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
         const tableData = rows.map(row => {
             const inputs = row.querySelectorAll('input');
             return `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>${inputs[2].value}</td></tr>`; // Adjusted for constraints input
         }).join('');
-        dataTablePreviews.push(`<div><strong>${tableName}:</strong><table><tr><th>Attribute Name</th><th>Attribute Type</th><th>Constraints</th></tr>${tableData}</table></div>`);
+        dataTablePreviews.push(`<div><strong style="display: block; margin-bottom: 12px;">${tableName}</strong><table><tr><th>Attribute Name</th><th>Attribute Type</th><th>Constraints</th></tr>${tableData}</table></div>`);
     });
     document.getElementById('preview-data-tables').innerHTML = dataTablePreviews.join('');
 
@@ -194,11 +227,16 @@
     stepTables.forEach(stepTable => {
         const stepRows = Array.from(stepTable.querySelectorAll('tr'));
         stepTablePreviews.push(stepRows.map(row => {
-            const inputs = row.querySelectorAll('input');
-            return `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>${inputs[2].value}</td></tr>`;
+            const cells = row.querySelectorAll('td');
+            const inputs = row.querySelectorAll('textarea');
+            const stepDescription = inputs[0].value.trim();
+            const suggestedCode = inputs[1].value.trim();
+            const stepNumber = (stepDescription || suggestedCode) ? cells[0].textContent : ''; // Show step number only if there's content
+            
+            return `<tr><td>${stepNumber}</td><td>${stepDescription}</td><td>${suggestedCode}</td></tr>`;        
         }).join(''));
     });
-    document.getElementById('preview-solution-steps').innerHTML = stepTablePreviews.map(table => `<table><tr><th>Step Number</th><th>Step Description</th><th>Suggested Codes</th></tr>${table}</table>`).join('');
+    document.getElementById('preview-solution-steps').innerHTML = stepTablePreviews.map(table => `<table><tr><th>Step Number / Step Description / Suggested Code</th></tr>${table}</table>`).join('');
 
     // Update self-review preview
     const reviewPreviews = [];
@@ -210,7 +248,7 @@
     document.getElementById('preview-self-review').innerHTML = reviewPreviews.join('');
 }
 
-
+let stepCounter = 2; // Initialize step counter
         function myCreateFunction(tablename) {
             const table = document.getElementById(tablename);
             var firstRow = table.rows[0];  // Get the first row to match the number of cells and input types
@@ -223,13 +261,29 @@
             const newRow = table.insertRow(-1);  // Append a new row at the end of the table
 
             // Create cells and inputs based on the first row
-            for (let i = 0; i < cellCount; i++) {
-                const newCell = newRow.insertCell(i);  // Insert a new cell in the new row
-                const firstInput = firstRow.cells[i].querySelector('input');  // Find the input in the first cell
-                const newInput = document.createElement('input');
-                newInput.type = firstInput.type;  // Set the input type to match the first row
-                newInput.oninput = updatePreview;  // Add the oninput event listener to update preview
-                newCell.appendChild(newInput);  // Append the input to the new cell
+            if (tablename.includes("data")) {
+                for (let i = 0; i < cellCount; i++) {
+                    const newCell = newRow.insertCell(i);  // Insert a new cell in the new row
+                    const firstInput = firstRow.cells[i].querySelector('input');  // Find the input in the first cell
+                    const newInput = document.createElement('input');
+                    newInput.type = firstInput.type;  // Set the input type to match the first row
+                    newInput.oninput = updatePreview;  // Add the oninput event listener to update preview
+                    newCell.appendChild(newInput);  // Append the input to the new cell
+                }
+            } else {
+                for (let i = 0; i < cellCount; i++) {
+                    const newCell = newRow.insertCell(i);  // Insert a new cell in the new row
+                    if (i === 0) { // First cell for step number
+                        newCell.textContent = stepCounter++; // Set and increment step number
+                    } else {
+                        const firstInput = firstRow.cells[i].querySelector('input, textarea');  // Find the input/textarea in the first cell
+                        const newInput = document.createElement(firstInput.tagName.toLowerCase());  // Create the same type (input/textarea)
+                        newInput.type = firstInput.type || '';  // Set the input type (if it exists) to match the first row
+                        newInput.className = firstInput.className;  // Match the class for styling  // Match the class for styling
+                        newInput.oninput = updatePreview;  // Add the oninput event listener to update preview
+                        newCell.appendChild(newInput);  // Append the textarea to the new cell
+                    }
+                }
             }
         }
 
@@ -249,7 +303,7 @@
             tables.forEach(table => {
                 const tableData = [];
                 const tableDiv = table.closest('div'); // Get the parent div of the table
-                const tableNameElement = tableDiv.querySelector('textarea');
+                const tableNameElement = tableDiv.querySelector('input[type="text"]');
                 const tableName = tableNameElement.value; // Get the user-input table name
 
                 const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
@@ -275,12 +329,13 @@
             step_tables.forEach(table => {
                 const rows = table.querySelectorAll('tr');
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input');
-                    if (inputs.length === 3) {
+                    const cells = row.querySelectorAll('td');
+                    const inputs = row.querySelectorAll('textarea');
+                    if (inputs.length === 2) {
                         step_data_table.push({
-                            Step_Number: inputs[0].value,
-                            Step_Description: inputs[1].value,
-                            Suggested_Codes: inputs[2].value
+                            Step_Number: parseInt(cells[0].textContent.trim(), 10),
+                            Step_Description: inputs[0].value,
+                            Suggested_Codes: inputs[1].value
                         });
                     }
                 });
@@ -323,5 +378,9 @@
         });
 
         document.addEventListener('DOMContentLoaded', updatePreview);
+        function preventDefaultAction(event) {
+            event.preventDefault(); // Prevents the default action
+        }
+
     </script>
 {% endblock %}
