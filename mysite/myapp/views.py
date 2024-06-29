@@ -1,5 +1,5 @@
 import json
-#import gemini
+import gemini
 import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -12,7 +12,7 @@ from django.db.models import F
 import random
 from .models import Example, ReviewQuestion, Question, DataColumn, DataTable, Profile, Review, ReviewQuestionResponse, \
     ReviewStepResponse
-
+import time
 
 def get_weather():
     api_key = "439d4b804bc8187953eb36d2a8c26a02"
@@ -145,7 +145,15 @@ def review(request, example_id):
     # Fetch the example first (optional: add error handling if example does not exist)
     # example = get_object_or_404(Example, pk=example_id)
     review_step_responses = ReviewStepResponse.objects.filter(review=review)
-
+    a = (example.data_tables.all())
+    dic = {}
+    for t in a:
+        dic[t.name] = []
+        for column in t.columns.all():
+            l = {column.name: column.data_type}
+            dic[t.name].append(l)
+    tables = gemini.generate_table_content(example.project_context, dic)
+    time.sleep(5)
     context = {
         'user': request.user,
         'navigation_items': [
@@ -157,6 +165,9 @@ def review(request, example_id):
         ],
         'review_step_responses': review_step_responses,
         "example": example,
+        'tables': tables,
+        'table_lengths': {table_name: len(next(iter(columns[0].values()))) for table_name, columns in tables.items()},
+
     }
     return render(request, 'myapp/Show_Review_Examples.html', context)
 
@@ -179,7 +190,7 @@ def new_workout(request):
         # Create the Example entry
         example = Example.objects.create(
             creator=profile,
-            title=request.POST.get('topic', 'No title provided'),
+            title=request.POST.get('topic', ''),
             project_description=request.POST.get('problem_description', ''),
             project_context=request.POST.get('problem_context', ''),
             completed=True
@@ -247,3 +258,76 @@ def new_workout(request):
 
     }
     return render(request, 'myapp/Create a new worked-out example.html', context)
+
+@login_required(login_url='index')
+def instr(request):
+    temperature, description = get_weather()
+    example_list = Example.objects.filter()
+    context = {
+        'navigation_items': [
+            {'name': 'Home', 'url': 'index'},
+            {'name': 'Be an Reviewer', 'url': 'review'},
+        ],
+        "temperature": temperature,
+        "description": description,
+        "example_list": example_list,
+    }
+    return render(request, 'myapp/instructor_review_index.html', context)
+
+
+@login_required(login_url='index')
+def instr_review(request, example_id):
+    example = Example.objects.get(pk=example_id)
+    review, created = Review.objects.get_or_create(example=example, reviewer=request.user.profile)
+
+    if request.method == 'POST':
+        # Process the review submission
+        action = request.POST.get('action', '')
+        if action == 'Cancel and Exit':
+            # Handle cancel action
+            return redirect('index')  # Redirect to wherever appropriate
+        
+
+        # Save the solution steps
+        for question in example.questions.all():
+            solution_text = request.POST.get(f'solution_{question.id}', '')
+            ReviewStepResponse.objects.update_or_create(
+                review=review, question=question,
+                defaults={'sql_statement': solution_text}
+            )
+
+
+        if action in ['Save and Exit', 'Save and Submit']:
+            review.problem_context_like = request.POST.get('problem_context_like', '')
+            review.problem_context_suggestions = request.POST.get('problem_context_suggestions', '')
+            review.recommendation_likelihood = request.POST.get('recommendation_likelihood', '')
+            review.appropriateness_class = request.POST.get('appropriateness_class', '')
+            review.save()
+        
+        if action == 'Save and Exit':
+            # Handle save and exit action
+            return redirect('index')  # Redirect to wherever appropriate    
+
+        if action == 'Save and Submit':
+            # Handle save and submit action
+            # Assuming you want to redirect to a success page after submission
+            return redirect('index')
+    # Fetch the example first (optional: add error handling if example does not exist)
+    # example = get_object_or_404(Example, pk=example_id)
+    
+    context = {
+        'user': request.user,
+        'navigation_items': [
+            {'name': 'Home', 'url': 'index'},
+            {'name': 'Be a Reviewer', 'url': 'review'},
+            # Assuming you have a separate view or page for becoming a reviewer
+            {'name': 'Conduct a Review', 'url': 'review_example', 'example_id': example_id},
+            # Assuming you need to pass parameters for clarity
+        ],
+        'review_step_responses': "",
+        "example": example,
+    }
+    return render(request, 'myapp/instructor_review.html', context)
+
+
+

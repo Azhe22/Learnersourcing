@@ -53,14 +53,6 @@ class Question(models.Model):
         ordering = ['order']
 
 
-class QuestionStep(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='steps')
-    description = models.TextField()
-    order = models.IntegerField(help_text="The order of the step within the question")
-
-    class Meta:
-        ordering = ['order']
-
 
 class Review(models.Model):
     example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='reviews')
@@ -114,40 +106,29 @@ class AssignedReview(models.Model):
     
 
 
-class ProblemTable(models.Model):
-    id = models.AutoField(primary_key=True)
+class ProblemTable(models.Model): #WorkedOutExample
     creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_problems')
-    project_context = models.TextField()
-    project_description = models.TextField()
-    provided_solution = models.TextField()
+    project_context = models.TextField()    #problem
+    project_description = models.TextField() #problem
+    provided_solution = models.TextField()  
     problem_type = models.CharField(max_length=255, default="Pl/SQL")
     self_review = models.FloatField(default=0)
     created_date = models.DateTimeField(auto_now_add=True)
-    completed = models.BooleanField(default=False)
-    student_reviewed = models.BooleanField(default=False)
-    instr_reviewed = models.BooleanField(default=False)
-    no_student_reviews = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False) #submitted
+    student_reviewed = models.BooleanField(default=False) #remove
+    instr_reviewed = models.BooleanField(default=False) #integer
+    no_student_reviews = models.IntegerField(default=0) #number
 
     def __str__(self):
         return f"{self.title} by {self.creator.user.username}"
 
-class SolnTable(models.Model):
-    id = models.AutoField(primary_key=True)
-    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_solutions')
-    problem = models.ForeignKey(ProblemTable, on_delete=models.CASCADE, related_name='solutions')
-    solution = models.TextField()
-    completed = models.BooleanField(default=False)
-    review_score = models.FloatField(default=0)
-    review = models.TextField()
-    is_review = models.BooleanField(default=False)
 
 class InstrChecks(models.Model):
-    id = models.AutoField(primary_key=True)
     creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_checks')
-    problem_id = models.IntegerField()
+    problem_id = models.IntegerField() #weid
     student_id = models.IntegerField()
-    is_question = models.BooleanField(default=False)
-    completed = models.BooleanField(default=False)
+    is_question = models.BooleanField(default=False) #remove
+    completed = models.BooleanField(default=False) #submitted
     review_score = models.FloatField(default=0)
     review = models.TextField()
 

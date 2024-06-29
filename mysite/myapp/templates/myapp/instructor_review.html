@@ -1,0 +1,130 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %} Review Form {% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <nav class="navigation">
+        {% for item in navigation_items %}
+            {% if item.example_id %}
+                <a href="{% url item.url example_id=item.example_id %}">{{ item.name }}</a>
+            {% else %}
+                <a href="{% url item.url %}">{{ item.name }}</a>
+            {% endif %}
+            {% if not forloop.last %} › {% endif %}
+        {% endfor %}
+    </nav>
+    <p class="welcome">{{ user.username }}, your students value your suggestions!</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="main-content">
+        <div class="column left">
+            <div class="problem-context">
+                <h2>Student: {{example.creator}}</h2>
+                <h2>WEID: {{ example.id }}</h2>
+                <h3>Problem Context</h3>
+                {{ example.project_context|linebreaks }}
+
+                <h3>Problem Description</h3>
+                {{ example.project_description|linebreaks }}
+
+                <h3>Data</h3>
+                {% for table in example.data_tables.all %}
+                    <h4>{{ table.name }} Table</h4>
+                    <table class="table-style">
+                        <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Data Constraints</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for column in table.columns.all %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                {% with column.data_type as data_type %}
+                                    {% with data_type|slice:"0:data_type|find:';'" as first_part %}
+                                        <td>{{ first_part }}</td>
+                                    {% endwith %}
+                                    {% with data_type|slice:"data_type|find:';'+1:" as second_part %}
+                                        <td>{{ second_part }}</td>
+                                    {% endwith %}
+                                {% endwith %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="column right">
+            
+            <div id="ReviewerSection" class="tabcontent" style="display:block;">
+                <div id="SolutionSubmission"  style="display:block;">
+                    <h3>Student Provided Question Review</h3>
+                    <label for="solution">Your Question Review</label>
+                    <br>
+                    <textarea id="solution" name="solution"
+                              placeholder="Enter your review for the problem." style="width: 100%;"></textarea>
+                    <br>
+                    <input type="range" id="question-rating" name="question-rating" class="slider" min="1" max="5">
+                    <div class="slider-labels">
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                    </div>                    <h3>Student Provided Steps</h3>
+                    {% for question in example.questions.all %}
+                        <p>Step {{ forloop.counter }}: {{ question.text }}</p>
+                    {% endfor %}
+                    <label for="solution">Your Step Review</label>
+                        <br>
+                        <textarea id="solution" name="solution"
+                                  placeholder="Enter your review for the solution steps." style="width: 100%;"></textarea>
+                        <br>
+                        <input type="range" id="step-rating" name="step-rating" class="slider" min="1" max="5">
+                        <div class="slider-labels">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                        </div>                        <h3>Student Provided Answer Code</h3>
+                        {% for response in review_step_responses %}
+                            <p>Step {{ forloop.counter }}: {{ response.sql_statement }}</p>
+                        {% endfor %}
+                        <label for="solution">Your Code Review</label>
+                        <br>
+                        <textarea id="solution" name="solution"
+                                  placeholder="Enter your review for the SQL statements." style="width: 100%;"></textarea>
+                        <br>
+                        <input type="range" id="code-rating" name="code-rating" class="slider" min="1" max="5">
+    <div class="slider-labels">
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="center">
+        <input type="submit" value="Cancel and Exit">
+        <input type="submit" value="Save and Exit">
+        <input type="submit" value="Save and Submit">
+    </div>
+</form>
+
+<script>
+
+</script>
+
+{% endblock %}
