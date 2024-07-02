@@ -1,7 +1,6 @@
 import google.generativeai as genai
 
 
-
 GOOGLE_API_KEY= ""
 with open("API_key.txt", "r") as f:
     GOOGLE_API_KEY = f.read().strip()
