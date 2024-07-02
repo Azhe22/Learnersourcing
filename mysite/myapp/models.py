@@ -6,7 +6,7 @@ from django.db import models
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_instructor = models.BooleanField(default=False)
+    instructor = models.BooleanField(default=False)
     points = models.IntegerField(default=0)
     questions_assigned = models.IntegerField(default=0)
 
@@ -14,21 +14,23 @@ class Profile(models.Model):
         return self.user.username
 
 
-class Example(models.Model):
+class WorkedOutExample(models.Model):
     # id = models.AutoField(primary_key=True)
     creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_examples')
     title = models.CharField(max_length=255)
-    project_description = models.TextField()
-    project_context = models.TextField()
+    problem_description = models.TextField()
+    problem_context = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
-    completed = models.BooleanField(default=False)
+    submitted = models.BooleanField(default=False)
+    student_reviews = models.IntegerField(default=0) #number
+    instructor_reviews = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.title} by {self.creator.user.username}"
 
 
 class DataTable(models.Model):
-    example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='data_tables')
+    example = models.ForeignKey(WorkedOutExample, on_delete=models.CASCADE, related_name='data_tables')
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -44,91 +46,34 @@ class DataColumn(models.Model):
         return f"{self.name} in {self.data_table.name}"
 
 
-class Question(models.Model):
-    example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='questions')
+class SolutionSteps(models.Model):
+    example = models.ForeignKey(WorkedOutExample, on_delete=models.CASCADE, related_name='questions')
     order = models.IntegerField(help_text="The order of the question within the example")
     text = models.TextField()
-
+    sql_statement = models.TextField(default="")
     class Meta:
         ordering = ['order']
 
 
 
-class Review(models.Model):
-    example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='reviews')
+class Review(models.Model): #Actual Review which stores the 4 review comments
+    example = models.ForeignKey(WorkedOutExample, on_delete=models.CASCADE, related_name='reviews')
     reviewer = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews')
-    problem_context_like = models.TextField(default="")
-    problem_context_suggestions = models.TextField(default="")
-    recommendation_likelihood = models.TextField(default="")
-    appropriateness_class = models.TextField(default="")
+    how_much_do_you_like_example = models.TextField(default="")
+    constructive_suggestions = models.TextField(default="")
+    how_likely_are_you_to_recommend_example = models.IntegerField(default=0)
+    #appropriateness_class = models.TextField(default="") #Only needed for instructor review
     class Meta:
         unique_together = ('example', 'reviewer')
 
-class ReviewStepResponse(models.Model):
+class ReviewSolutionSteps(models.Model): #Stores the reviewer's answer/solution
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='step_responses')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='review_responses')
-    sql_statement = models.TextField()
-    # Add more fields as necessary for step response
+    question = models.ForeignKey(SolutionSteps, on_delete=models.CASCADE, related_name='review_responses')
+    review_sql_statement = models.TextField(default="")
 
-
-class ReviewQuestion(models.Model):
-    question_text = models.TextField()
-    response_type = models.CharField(max_length=20, choices=[
-        ('rating', 'Rating'),
-        ('free_response', 'Free Response'),
-    ])
-
-    def __str__(self):
-        return f"Review Question: {self.question_text[:50]}..."
-
-
-class ReviewQuestionResponse(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='feedbacks')
-    question = models.ForeignKey(ReviewQuestion, on_delete=models.CASCADE, related_name='feedbacks')
-    rating = models.CharField(max_length=50, choices=[
-        ('completely_disagree', 'Completely Disagree'),
-        ('disagree', 'Disagree'),
-        ('neutral', 'Neutral'),
-        ('agree', 'Agree'),
-        ('completely_agree', 'Completely Agree'),
-    ])
-    free_response = models.TextField(blank=True, null=True)
-
-
-class AssignedReview(models.Model):
-    example = models.ForeignKey(Example, on_delete=models.CASCADE, related_name='assigned_reviews')
-    reviewer = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='assignments')
-    assigned_date = models.DateTimeField(auto_now_add=True)
-    completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.example.title} assigned to {self.reviewer.user.username}"
-    
-
-
-class ProblemTable(models.Model): #WorkedOutExample
-    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_problems')
-    project_context = models.TextField()    #problem
-    project_description = models.TextField() #problem
-    provided_solution = models.TextField()  
-    problem_type = models.CharField(max_length=255, default="Pl/SQL")
-    self_review = models.FloatField(default=0)
-    created_date = models.DateTimeField(auto_now_add=True)
-    completed = models.BooleanField(default=False) #submitted
-    student_reviewed = models.BooleanField(default=False) #remove
-    instr_reviewed = models.BooleanField(default=False) #integer
-    no_student_reviews = models.IntegerField(default=0) #number
-
-    def __str__(self):
-        return f"{self.title} by {self.creator.user.username}"
-
-
-class InstrChecks(models.Model):
-    creator = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_checks')
-    problem_id = models.IntegerField() #weid
-    student_id = models.IntegerField()
-    is_question = models.BooleanField(default=False) #remove
-    completed = models.BooleanField(default=False) #submitted
+class InstrReviews(models.Model): #Needs development
+    example = models.ForeignKey(WorkedOutExample, on_delete=models.CASCADE, related_name='instr_reviews')
+    submitted = models.BooleanField(default=False) #submitted
     review_score = models.FloatField(default=0)
     review = models.TextField()
 

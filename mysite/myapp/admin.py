@@ -1,15 +1,12 @@
 from django.contrib import admin
-from .models import (Profile, Example, Question, Review, ReviewStepResponse, ReviewQuestionResponse,
-                     AssignedReview, ReviewQuestion, DataTable, DataColumn)
+from .models import (Profile, WorkedOutExample, SolutionSteps, Review, ReviewSolutionSteps,
+                    DataTable, DataColumn)
 # Register your models here.
 admin.site.register(Profile)
-admin.site.register(Example)
-admin.site.register(Question)
+admin.site.register(WorkedOutExample)
+admin.site.register(SolutionSteps)
 admin.site.register(Review)
-admin.site.register(ReviewStepResponse)
-admin.site.register(ReviewQuestionResponse)
-admin.site.register(AssignedReview)
-admin.site.register(ReviewQuestion)
+admin.site.register(ReviewSolutionSteps)
 admin.site.register(DataTable)
 admin.site.register(DataColumn)
 

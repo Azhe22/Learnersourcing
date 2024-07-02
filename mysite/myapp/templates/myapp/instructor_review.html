@@ -65,52 +65,28 @@
             
             <div id="ReviewerSection" class="tabcontent" style="display:block;">
                 <div id="SolutionSubmission"  style="display:block;">
-                    <h3>Student Provided Question Review</h3>
-                    <label for="solution">Your Question Review</label>
-                    <br>
-                    <textarea id="solution" name="solution"
-                              placeholder="Enter your review for the problem." style="width: 100%;"></textarea>
-                    <br>
-                    <input type="range" id="question-rating" name="question-rating" class="slider" min="1" max="5">
-                    <div class="slider-labels">
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
-                        <span>5</span>
-                    </div>                    <h3>Student Provided Steps</h3>
-                    {% for question in example.questions.all %}
-                        <p>Step {{ forloop.counter }}: {{ question.text }}</p>
+                <h3>Comment as required on the questions and the code.</h3>
+                <label for="dropdown">Select a problem step:</label>
+                <select id="dropdown" name="dropdown" onchange="updateValues()">
+                    {% for key, values in dic.items %}
+                    <option value="{{ key }}" data-values='{{ values }}'>{{ key }}</option>
                     {% endfor %}
-                    <label for="solution">Your Step Review</label>
-                        <br>
-                        <textarea id="solution" name="solution"
-                                  placeholder="Enter your review for the solution steps." style="width: 100%;"></textarea>
-                        <br>
-                        <input type="range" id="step-rating" name="step-rating" class="slider" min="1" max="5">
-                        <div class="slider-labels">
-                            <span>1</span>
-                            <span>2</span>
-                            <span>3</span>
-                            <span>4</span>
-                            <span>5</span>
-                        </div>                        <h3>Student Provided Answer Code</h3>
-                        {% for response in review_step_responses %}
-                            <p>Step {{ forloop.counter }}: {{ response.sql_statement }}</p>
-                        {% endfor %}
-                        <label for="solution">Your Code Review</label>
-                        <br>
-                        <textarea id="solution" name="solution"
-                                  placeholder="Enter your review for the SQL statements." style="width: 100%;"></textarea>
-                        <br>
+                </select>
+                <div id="values">
+                    <!-- Values will be displayed here -->
+                </div>
+                <label for="comments">Comments:</label>
+                <textarea id="comments" name="comments" rows="4" cols="50"></textarea>
+                <br>
+                <h3> Overall rating of the problem. </h3>
                         <input type="range" id="code-rating" name="code-rating" class="slider" min="1" max="5">
-    <div class="slider-labels">
-        <span>1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>4</span>
-        <span>5</span>
-    </div>
+                            <div class="slider-labels">
+                                <span>1</span>
+                                <span>2</span>
+                                <span>3</span>
+                                <span>4</span>
+                                <span>5</span>
+                            </div>
                 </div>
             </div>
         </div>
@@ -123,8 +99,22 @@
     </div>
 </form>
 
-<script>
 
+<script>
+    function updateValues() {
+            const select = document.getElementById('dropdown');
+            const selectedOption = select.options[select.selectedIndex];
+            const values = JSON.parse(selectedOption.getAttribute('data-values'));
+
+            let displayArea = document.getElementById('values');
+            displayArea.innerHTML = '';
+
+            values.forEach(value => {
+                let p = document.createElement('p');
+                p.textContent = value;
+                displayArea.appendChild(p);
+            });
+        }
 </script>
 
 {% endblock %}
