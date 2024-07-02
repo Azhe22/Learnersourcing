@@ -18,17 +18,17 @@
     <p class="welcome">{{ user.username }}, your peers value your suggestions!</p>
 </div>
 
-<form method="post">
+<form method="post" action="{% url 'review_example' example_id=example_id %}" onsubmit="return validateForm();">
     {% csrf_token %}
     <div class="main-content">
         <div class="column left">
             <div class="problem-context">
                 <h2>WEID: {{ example.id }}</h2>
                 <h3>Problem Context</h3>
-                {{ example.project_context|linebreaks }}
+                {{ example.problem_context|linebreaks }}
 
                 <h3>Problem Description</h3>
-                {{ example.project_description|linebreaks }}
+                {{ example.problem_description|linebreaks }}
 
                 <h3>Data</h3>
                 {% for table_name, columns in tables.items %}
@@ -73,15 +73,15 @@
                         <p>Step {{ forloop.counter }}: {{ question.text }}</p>
                         <label for="solution">Your Solution</label>
                         <br>
-                        <textarea id="solution" name="solution"
-                                  placeholder="Enter your proposed solutions here in the format of SQL codes." style="width: 100%;"></textarea>
+                        <textarea id="solution_{{ question.id }}" name="solution_{{ question.id }}"
+                            placeholder="Enter your proposed solutions here in the format of SQL codes." style="width: 100%;height: 200px;"></textarea>
                         <br>
                     {% endfor %}
                 </div>
                 <button type="button" class="sub-tablink" style="margin-top: 40px;" onclick="toggleAnswerCode()">Suggested Answers</button>                <div id="AnswerCode" style="display:none;">
                     <h3>Student Provided Answer Code</h3>
-                    {% for response in review_step_responses %}
-                        <p>Step {{ forloop.counter }}: {{ response.sql_statement }}</p>
+                    {% for question in example.questions.all %}
+                        <p>Step {{ forloop.counter }}: {{ question.sql_statement }}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -90,28 +90,24 @@
                 <h3>Rate This Worked-Out Example on Following Criteria:</h3>
                 <label>What do you like about this question?</label>
                 <label>
-                    <textarea name="problem_context" placeholder="Please help your peers with their work." style="width: 100%;"></textarea>
-                </label>
+                    <textarea id="like_question" name="like_question" placeholder="Please help your peers with their work." style="width: 100%;height: 100px;"></textarea>                </label>
                 <label>Any constructive suggestions for this question?</label>
                 <label>
-                    <textarea name="problem_context" placeholder="Please help your peers with their work." style="width: 100%;"></textarea>
-                </label>
+                    <textarea id="suggestions_question" name="suggestions_question" placeholder="Please help your peers with their work." style="width: 100%;height: 100px;"></textarea>                </label>
                 <label>How likely are you to recommend this question to others?</label>
                 <label>
-                    <textarea name="problem_context" placeholder="Please help your peers with their work." style="width: 100%;"></textarea>
-                </label>
+                    <textarea id="recommend_question" name="recommend_question" placeholder="Please help your peers with their work." style="width: 100%;height: 100px;"></textarea>                </label>
                 <label>How appropriate is this question for the class?</label>
                 <label>
-                    <textarea name="problem_context" placeholder="Please help your peers with their work." style="width: 100%;"></textarea>
-                </label>
+                    <textarea id="appropriate_question" name="appropriate_question" placeholder="Please help your peers with their work." style="width: 100%;height: 100px;"></textarea>                </label>
             </div>
         </div>
     </div>
 
     <div class="center">
-        <input type="submit" value="Cancel and Exit">
-        <input type="submit" value="Save and Exit">
-        <input type="submit" value="Save and Submit">
+        <button type="button" onclick="setAction('Cancel and Exit');">Cancel and Exit</button>
+        <button type="button" onclick="setAction('Save and Exit');">Save and Exit</button>
+        <button type="button" onclick="setAction('Save and Submit');">Save and Submit</button>
     </div>
 </form>
 
@@ -143,6 +139,47 @@
             answerCodeSection.style.display = "block";
             answerCodeButton.className += " active";
         }
+    }
+
+    function setAction(action) {
+        if (action === 'Save and Submit' && !validateForm()) {
+            alert("Please fill in all review and rating fields before submitting.");
+            return;
+        }
+        submitForm(action);
+    }
+
+    function validateForm() {
+        var isValid = true;
+
+        // Check if solutions are filled
+        var solutionAreas = document.querySelectorAll("[id^='solution_']");
+        solutionAreas.forEach(function(area) {
+            if (!area.value.trim()) {
+                isValid = false;
+                area.style.borderColor = "red";
+            } else {
+                area.style.borderColor = "";
+            }
+        });
+
+        // Check if rating textareas are filled
+        var ratingAreas = ["like_question", "suggestions_question", "recommend_question", "appropriate_question"];
+        ratingAreas.forEach(function(id) {
+            var area = document.getElementById(id);
+            if (!area.value.trim()) {
+                isValid = false;
+                area.style.borderColor = "red";
+            } else {
+                area.style.borderColor = "";
+            }
+        });
+
+        return isValid;
+    }
+
+    function submitForm(action) {
+        document.forms[0].submit();
     }
 
 </script>

@@ -10,8 +10,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import F
 import random
-from .models import Example, ReviewQuestion, Question, DataColumn, DataTable, Profile, Review, ReviewQuestionResponse, \
-    ReviewStepResponse
+from .models import WorkedOutExample, SolutionSteps, DataColumn, DataTable, Profile, Review, \
+    ReviewSolutionSteps
 import time
 
 def get_weather():
@@ -74,8 +74,8 @@ def expert(request):
         {'name': 'Be an Expert', 'url': 'expert'},
 
     ],
-        'completed_workouts': Example.objects.filter(creator=request.user.profile, completed=True),
-        'incomplete_workouts': Example.objects.filter(creator=request.user.profile, completed=False),
+        'completed_workouts': WorkedOutExample.objects.filter(creator=request.user.profile, submitted=True),
+        'incomplete_workouts': WorkedOutExample.objects.filter(creator=request.user.profile, submitted=False),
     }
     return render(request, 'myapp/be_an_expert.html', context)
 
@@ -92,7 +92,8 @@ def explore(request):
 @login_required(login_url='index')
 def review_menu(request):
     temperature, description = get_weather()
-    example_list = Example.objects.filter()
+    profile = Profile.objects.get(user=request.user)
+    example_list = WorkedOutExample.objects.filter(reviews__reviewer=profile).distinct()
     context = {
         'navigation_items': [
             {'name': 'Home', 'url': 'index'},
@@ -107,7 +108,7 @@ def review_menu(request):
 
 @login_required(login_url='index')
 def review(request, example_id):
-    example = Example.objects.get(pk=example_id)
+    example = WorkedOutExample.objects.get(pk=example_id)
     review, created = Review.objects.get_or_create(example=example, reviewer=request.user.profile)
 
     if request.method == 'POST':
@@ -120,31 +121,28 @@ def review(request, example_id):
 
         # Save the solution steps
         for question in example.questions.all():
+            review_step_response = ReviewSolutionSteps.objects.get(review=review, question=question)
             solution_text = request.POST.get(f'solution_{question.id}', '')
-            ReviewStepResponse.objects.update_or_create(
-                review=review, question=question,
-                defaults={'sql_statement': solution_text}
-            )
+            review_step_response.review_sql_statement = solution_text
+            review_step_response.save()
 
-
-        if action in ['Save and Exit', 'Save and Submit']:
-            review.problem_context_like = request.POST.get('problem_context_like', '')
-            review.problem_context_suggestions = request.POST.get('problem_context_suggestions', '')
-            review.recommendation_likelihood = request.POST.get('recommendation_likelihood', '')
-            review.appropriateness_class = request.POST.get('appropriateness_class', '')
-            review.save()
+        review.how_much_do_you_like_example = request.POST.get('like_question', '')
+        review.constructive_suggestions = request.POST.get('suggestions_question', '')
+        #review.how_likely_are_you_to_recommend_example = request.POST.get('recommend_question', '') #Change to slider scale
+        #review.appropriateness_class = request.POST.get('appropriate_question', '')
+        review.save()
         
         if action == 'Save and Exit':
             # Handle save and exit action
-            return redirect('index')  # Redirect to wherever appropriate    
+            return redirect('review_menu')  # Redirect to wherever appropriate    
 
         if action == 'Save and Submit':
             # Handle save and submit action
             # Assuming you want to redirect to a success page after submission
-            return redirect('index')
+            return redirect('review_menu')
     # Fetch the example first (optional: add error handling if example does not exist)
     # example = get_object_or_404(Example, pk=example_id)
-    review_step_responses = ReviewStepResponse.objects.filter(review=review)
+    review_step_responses = ReviewSolutionSteps.objects.filter(review=review)
     a = (example.data_tables.all())
     dic = {}
     for t in a:
@@ -152,7 +150,7 @@ def review(request, example_id):
         for column in t.columns.all():
             l = {column.name: column.data_type}
             dic[t.name].append(l)
-    tables = gemini.generate_table_content(example.project_context, dic)
+    tables = gemini.generate_table_content(example.problem_context, dic)
     time.sleep(5)
     context = {
         'user': request.user,
@@ -167,7 +165,7 @@ def review(request, example_id):
         "example": example,
         'tables': tables,
         'table_lengths': {table_name: len(next(iter(columns[0].values()))) for table_name, columns in tables.items()},
-
+        'example_id': example_id
     }
     return render(request, 'myapp/Show_Review_Examples.html', context)
 
@@ -188,12 +186,12 @@ def new_workout(request):
         profile = Profile.objects.get(user=request.user)
 
         # Create the Example entry
-        example = Example.objects.create(
+        example = WorkedOutExample.objects.create(
             creator=profile,
             title=request.POST.get('topic', ''),
-            project_description=request.POST.get('problem_description', ''),
-            project_context=request.POST.get('problem_context', ''),
-            completed=True
+            problem_description=request.POST.get('problem_description', ''),
+            problem_context=request.POST.get('problem_context', ''),
+            submitted=True
         )
         # Create Data Tables and Columns
         for table_info in data_tables_data:
@@ -209,11 +207,12 @@ def new_workout(request):
                 )
         
         all_users = Profile.objects.all()
-        eligible_users = all_users.exclude(questions_assigned__gte=3)
+        eligible_users = all_users.exclude(questions_assigned=3)
+        eligible_users = eligible_users.exclude(id=profile.id)
         if eligible_users.exists():
             selected_user = random.choice(eligible_users)
 
-            selected_user.questions_assigned = F('questions_assigned') + 1
+            selected_user.questions_assigned = selected_user.questions_assigned + 1
             review = Review.objects.create(
             example=example,
             reviewer=selected_user
@@ -225,26 +224,20 @@ def new_workout(request):
         )
         # Create Questions from step_tables_data
         for idx, steps in enumerate(step_tables_data, start=1):
-            question = Question.objects.create(
+            question = SolutionSteps.objects.create(
                 example=example,
                 order=steps['Step_Number'],
                 text=steps['Step_Description'],
+                sql_statement=steps['Suggested_Codes'],
             )
-            ReviewStepResponse.objects.create(
+            ReviewSolutionSteps.objects.create(
                 review=review,
                 question=question,
-                sql_statement=steps['Suggested_Codes'],
+                
             )
 
         # Handling review data
 
-        for response_data in review_data:
-            question = ReviewQuestion.objects.get(pk=response_data["question_id"])
-            ReviewQuestionResponse.objects.create(
-                review=review,
-                question=question,
-                rating=response_data["rating"],
-            )
 
         return redirect('expert')
 
@@ -253,16 +246,15 @@ def new_workout(request):
         'navigation_items': [
             {'name': 'Home', 'url': 'index'},
             {'name': 'Create a new worked-out example', 'url': 'new_workout'},
-        ],
-        'review_questions': ReviewQuestion.objects.all(),
-
+        ]
     }
     return render(request, 'myapp/Create a new worked-out example.html', context)
 
 @login_required(login_url='index')
 def instr(request):
     temperature, description = get_weather()
-    example_list = Example.objects.filter()
+    example_list = WorkedOutExample.objects.filter()
+    review_list = Review.objects.filter()
     context = {
         'navigation_items': [
             {'name': 'Home', 'url': 'index'},
@@ -271,13 +263,14 @@ def instr(request):
         "temperature": temperature,
         "description": description,
         "example_list": example_list,
+        "review_list": review_list,
     }
     return render(request, 'myapp/instructor_review_index.html', context)
 
 
 @login_required(login_url='index')
 def instr_review(request, example_id):
-    example = Example.objects.get(pk=example_id)
+    example = WorkedOutExample.objects.get(pk=example_id)
     review, created = Review.objects.get_or_create(example=example, reviewer=request.user.profile)
 
     if request.method == 'POST':
@@ -286,23 +279,6 @@ def instr_review(request, example_id):
         if action == 'Cancel and Exit':
             # Handle cancel action
             return redirect('index')  # Redirect to wherever appropriate
-        
-
-        # Save the solution steps
-        for question in example.questions.all():
-            solution_text = request.POST.get(f'solution_{question.id}', '')
-            ReviewStepResponse.objects.update_or_create(
-                review=review, question=question,
-                defaults={'sql_statement': solution_text}
-            )
-
-
-        if action in ['Save and Exit', 'Save and Submit']:
-            review.problem_context_like = request.POST.get('problem_context_like', '')
-            review.problem_context_suggestions = request.POST.get('problem_context_suggestions', '')
-            review.recommendation_likelihood = request.POST.get('recommendation_likelihood', '')
-            review.appropriateness_class = request.POST.get('appropriateness_class', '')
-            review.save()
         
         if action == 'Save and Exit':
             # Handle save and exit action
@@ -314,7 +290,18 @@ def instr_review(request, example_id):
             return redirect('index')
     # Fetch the example first (optional: add error handling if example does not exist)
     # example = get_object_or_404(Example, pk=example_id)
-    
+    dic = {}
+    dic["Problem Context"] = [example.problem_context]
+    dic["Problem Description"] = [example.problem_description]
+
+    count = 1
+    for question in example.questions.all():
+        dic["Step " + str(count)] = [question.text, question.sql_statement]
+        count += 1
+
+    for key in dic:
+        dic[key] = json.dumps(dic[key])
+
     context = {
         'user': request.user,
         'navigation_items': [
@@ -324,8 +311,9 @@ def instr_review(request, example_id):
             {'name': 'Conduct a Review', 'url': 'review_example', 'example_id': example_id},
             # Assuming you need to pass parameters for clarity
         ],
-        'review_step_responses': "",
+        'review': review,
         "example": example,
+        "dic": dic,
     }
     return render(request, 'myapp/instructor_review.html', context)
 

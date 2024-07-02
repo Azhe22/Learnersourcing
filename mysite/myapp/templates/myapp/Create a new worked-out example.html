@@ -86,7 +86,7 @@
                 <button type="button" onclick="myDeleteFunction('data_table_${tableCounter}')">Delete row</button>
                                 </div>
                                 <button style="margin-top: 20px;" type="button" onclick="addNewTable()">Add Data Table</button>
-                            </div>
+                                <button type="button" onclick="removeTable(`table_div_${tableCounter-1}`, '${tableCounter}')">Remove Table</button>                            </div>
                             <div id="solution-section" class="content-Section">
                                 <h2>Solution</h2>
                                 <div id="datatable1">
@@ -173,9 +173,10 @@
 
             // Create new table div
             const newTableDiv = document.createElement('div');
+            newTableDiv.id = `table_div_${tableCounter}`;
             newTableDiv.innerHTML = `
-                <label>Data Table #${tableCounter}:</label>
-                <input type="text" style="width: 210px;" placeholder="Enter the name for your data table" oninput="updatePreview()">
+                <label style="margin-top: 10px;">Data Table #${tableCounter}:</label>
+                <input type="text" style="width: 210px;margin-top: 10px;" placeholder="Enter the name for your data table" oninput="updatePreview()">
                 <table id="data_table_${tableCounter}">
                     <tr>
                         <th>Attribute Name</th>
@@ -196,6 +197,19 @@
             container.appendChild(newTableDiv);
 
             tableCounter++; // Increment table counter
+        }
+
+        function removeTable(tableDivId, tableID) {
+            if (tableID == 2) {
+                return;
+            }
+            const tableDiv = document.getElementById(tableDivId);
+            
+            if (tableDiv) {
+                tableDiv.remove();
+            }
+            tableCounter--;
+            updatePreview();
         }
 
         function updatePreview() {
